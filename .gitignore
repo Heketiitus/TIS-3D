@@ -1,40 +1,40 @@
-#system
-.DS_Store
+### Gradle ###
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
 
-# eclipse
-bin/
-*.launch
-.settings
-.metadata
-.classpath
-.project
-
-# idea
-out/
-*.ipr
+### IntelliJ IDEA ###
+.idea/
 *.iws
 *.iml
-.idea/
+*.ipr
+out/
+!**/src/**/out/
 
-# gradle
-build/
-.gradle/
+.run/
 
-# other
-eclipse/
-output/
-libs/
-classes/
+### Eclipse ###
+.apt_generated
+.classpath
+.eclipse/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/**/bin/
 
-#vscode
-.vscode
+### VS Code ###
+.vscode/
 
-# Files from Forge MDK
-forge*changelog.txt
+### Mac OS ###
+.DS_Store
 
-# generated resources
-**/src/generated/
-
-# minecraft
+### Minecraft Modding ###
 run/
-logs/
+!**/src/**/run/
+**/src/generated/**/.cache/
+repo/
+!**/src/**/repo/

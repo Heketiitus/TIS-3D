@@ -1,0 +1,36 @@
+package li.cil.tis3d.api;
+
+import li.cil.manual.api.render.FontRenderer;
+import li.cil.tis3d.util.ClientSided;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+
+import java.util.function.Supplier;
+
+/**
+ * Glue / actual references for the TIS-3D API.
+ */
+public final class API {
+    /**
+     * The ID of the mod, i.e. the internal string it is identified by.
+     */
+    public static final String MOD_ID = "tis3d";
+
+    // --------------------------------------------------------------------- //
+
+    // Set in TIS-3D constructor, prefer using static entry point classes instead where possible.
+    public static Supplier<CreativeModeTab> itemGroup;
+    public static li.cil.tis3d.api.detail.InfraredAPI infraredAPI;
+
+    @ClientSided
+    public static FontRenderer normalFontRenderer;
+    @ClientSided
+    public static FontRenderer smallFontRenderer;
+
+    public static ResourceLocation resource(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    }
+
+    private API() {
+    }
+}

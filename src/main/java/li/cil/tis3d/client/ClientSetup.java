@@ -1,0 +1,51 @@
+package li.cil.tis3d.client;
+
+import li.cil.tis3d.api.API;
+import li.cil.tis3d.api.prefab.module.AbstractModule;
+import li.cil.tis3d.client.gui.ReadOnlyMemoryModuleScreen;
+import li.cil.tis3d.client.gui.TerminalModuleScreen;
+import li.cil.tis3d.client.renderer.block.entity.CasingBlockEntityRenderer;
+import li.cil.tis3d.client.renderer.block.entity.ControllerBlockEntityRenderer;
+import li.cil.tis3d.client.renderer.block.neoforge.ModuleModelLoader;
+import li.cil.tis3d.client.renderer.font.NormalFontRenderer;
+import li.cil.tis3d.client.renderer.font.SmallFontRenderer;
+import li.cil.tis3d.common.block.entity.BlockEntities;
+import li.cil.tis3d.common.container.Containers;
+import li.cil.tis3d.util.ClientSided;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
+import net.neoforged.neoforge.common.NeoForge;
+
+
+/**
+ * Takes care of client-side only setup.
+ */
+@ClientSided
+public final class ClientSetup {
+    public static void setup(final FMLClientSetupEvent ignoredEvent) {
+        API.normalFontRenderer = NormalFontRenderer.INSTANCE;
+        API.smallFontRenderer = SmallFontRenderer.INSTANCE;
+
+        BlockEntityRenderers.register(BlockEntities.CASING.get(), CasingBlockEntityRenderer::new);
+        BlockEntityRenderers.register(BlockEntities.CONTROLLER.get(), ControllerBlockEntityRenderer::new);
+
+        NeoForge.EVENT_BUS.addListener((RegisterMenuScreensEvent e) -> e.register(Containers.READ_ONLY_MEMORY_MODULE.get(), ReadOnlyMemoryModuleScreen::new));
+        NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> AbstractModule.MainThreadDisposer.disposeModules());
+        NeoForge.EVENT_BUS.addListener((RenderGuiEvent.Pre event) -> {
+            if (Minecraft.getInstance().screen instanceof TerminalModuleScreen) {
+                event.setCanceled(true);
+            }
+        });
+    }
+
+    @SubscribeEvent
+    public static void handleModelRegistryEvent(ModelEvent.RegisterGeometryLoaders event) {
+        event.register(API.resource("module"), new ModuleModelLoader());
+    }
+}
