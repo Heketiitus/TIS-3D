@@ -35,7 +35,7 @@ public class Inventory implements Container {
         final ListTag itemList = new ListTag();
         for (final ItemStack stack : items) {
             final CompoundTag stackTag = new CompoundTag();
-            if (stack != null) {
+            if (stack != null && !stack.isEmpty()) {
                 stack.save(provider, stackTag);
             }
             itemList.add(stackTag);

@@ -108,9 +108,7 @@ public final class CodeBookScreen extends Screen {
         saveProgram();
 
         // Save any changes made and send them to the server.
-        final CompoundTag tag = new CompoundTag();
-        data.save(tag);
-        Network.sendToServer(new CodeBookDataMessage(hand, tag));
+        Network.sendToServer(new CodeBookDataMessage(hand, data));
     }
 
     @Override

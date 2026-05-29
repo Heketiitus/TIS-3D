@@ -17,16 +17,15 @@ public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> TABS = RegistryUtils.getDeferred(Registries.CREATIVE_MODE_TAB);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> COMMON = TABS.register("common", () ->
-        CreativeTabRegistry.create(builder -> {
-            builder.icon(() -> new ItemStack(Items.CONTROLLER.get()));
-            builder.title(Component.translatable("itemGroup.tis3d.common"));
-            builder.displayItems((parameters, output) -> {
+        CreativeModeTab.builder()
+            .icon(() -> new ItemStack(Items.CONTROLLER.get()))
+            .title(Component.translatable("itemGroup.tis3d.common"))
+            .displayItems((parameters, output) -> {
                 BuiltInRegistries.ITEM.entrySet().stream()
                     .filter(entry -> entry.getKey().location().getNamespace().equals(API.MOD_ID))
                     .map(Map.Entry::getValue)
                     .forEach(item -> output.accept(new ItemStack(item)));
-            });
-        }));
+            }).build());
 
     public static void initialize(IEventBus bus) {
         TABS.register(bus);

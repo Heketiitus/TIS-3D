@@ -1,6 +1,5 @@
 package li.cil.tis3d.common.module;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import li.cil.tis3d.api.machine.Casing;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Pipe;
@@ -121,7 +120,6 @@ public final class AudioModule extends AbstractModule {
 
     public record Note(int id, NoteBlockInstrument instrument) { }
 
-    @ExpectPlatform
     @Nullable
     private static Note transformNote(final AudioModule module, final Note note) {
         throw new AssertionError();

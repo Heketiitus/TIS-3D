@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public final class ConfigManagerImpl extends ConfigManager {
-    private static final Map<IConfigSpec<ModConfigSpec>, ConfigDefinition> CONFIGS = new HashMap<>();
+    private static final Map<ModConfigSpec, ConfigDefinition> CONFIGS = new HashMap<>();
 
     // --------------------------------------------------------------------- //
 
@@ -40,7 +40,7 @@ public final class ConfigManagerImpl extends ConfigManager {
                 case CLIENT -> ModConfig.Type.CLIENT;
                 case SERVER -> ModConfig.Type.SERVER;
             };
-            ModLoadingContext.get().registerConfig(platformType, spec);
+            //TODO ModLoadingContext.get().registerConfig(platformType, spec);
         });
 
         ModEventBus.INSTANCE.addListener(ConfigManagerImpl::handleModConfigEvent);

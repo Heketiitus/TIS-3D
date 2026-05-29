@@ -3,6 +3,9 @@ package li.cil.tis3d.util;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 
 import java.util.ArrayList;
@@ -46,6 +49,15 @@ public abstract class RegistryUtils {
             phase = Phase.INIT;
         }
     }
+
+    public static void finish(IEventBus bus) {
+        if (phase != Phase.INIT) throw new IllegalStateException();
+        phase = Phase.POST_INIT;
+
+        bus.addListener((NewRegistryEvent e) -> BUILDERS.forEach(e::create));
+        BUILDERS.clear();
+    }
+
     private RegistryUtils() {
     }
 

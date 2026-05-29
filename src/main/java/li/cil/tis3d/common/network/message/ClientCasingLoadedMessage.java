@@ -1,6 +1,5 @@
 package li.cil.tis3d.common.network.message;
 
-import dev.architectury.networking.NetworkManager;
 import li.cil.tis3d.api.machine.Casing;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.common.block.entity.CasingBlockEntity;
@@ -8,14 +7,24 @@ import li.cil.tis3d.common.network.Network;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public final class ClientCasingLoadedMessage extends AbstractMessageWithPosition {
+    public static final Type<ClientCasingLoadedMessage> TYPE = Network.type("casing_loaded");
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClientCasingLoadedMessage> STREAM_CODEC = CustomPacketPayload.codec(
+        ClientCasingLoadedMessage::toBytes,
+        ClientCasingLoadedMessage::new
+    );
+
     public ClientCasingLoadedMessage(final Casing casing) {
         super(casing.getPosition());
     }
 
-    public ClientCasingLoadedMessage(final FriendlyByteBuf buffer) {
+    public ClientCasingLoadedMessage(final RegistryFriendlyByteBuf buffer) {
         super(buffer);
     }
 
@@ -23,9 +32,9 @@ public final class ClientCasingLoadedMessage extends AbstractMessageWithPosition
     // AbstractMessage
 
     @Override
-    public void handleMessage(NetworkManager.PacketContext context) {
+    public void handleMessage(IPayloadContext context) {
         final var level = getServerLevel(context);
-        if (level != null && context.getPlayer() instanceof ServerPlayer player) {
+        if (level != null && context.player() instanceof ServerPlayer player) {
             withBlockEntity(level, CasingBlockEntity.class, casing -> {
                 final var listTag = new ListTag();
                 for (var face : Face.VALUES) {
@@ -39,5 +48,10 @@ public final class ClientCasingLoadedMessage extends AbstractMessageWithPosition
                 Network.sendToPlayer(player, new ServerCasingInitializeMessage(casing, listTag));
             });
         }
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

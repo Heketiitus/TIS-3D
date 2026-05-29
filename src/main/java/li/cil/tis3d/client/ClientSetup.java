@@ -35,7 +35,6 @@ public final class ClientSetup {
         BlockEntityRenderers.register(BlockEntities.CASING.get(), CasingBlockEntityRenderer::new);
         BlockEntityRenderers.register(BlockEntities.CONTROLLER.get(), ControllerBlockEntityRenderer::new);
 
-        NeoForge.EVENT_BUS.addListener((RegisterMenuScreensEvent e) -> e.register(Containers.READ_ONLY_MEMORY_MODULE.get(), ReadOnlyMemoryModuleScreen::new));
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> AbstractModule.MainThreadDisposer.disposeModules());
         NeoForge.EVENT_BUS.addListener((RenderGuiEvent.Pre event) -> {
             if (Minecraft.getInstance().screen instanceof TerminalModuleScreen) {
@@ -44,7 +43,7 @@ public final class ClientSetup {
         });
     }
 
-    @SubscribeEvent
+
     public static void handleModelRegistryEvent(ModelEvent.RegisterGeometryLoaders event) {
         event.register(API.resource("module"), new ModuleModelLoader());
     }

@@ -1,9 +1,5 @@
 package li.cil.tis3d.common.network;
 
-import dev.architectury.event.events.client.ClientTickEvent;
-import dev.architectury.event.events.common.TickEvent;
-import dev.architectury.networking.NetworkManager;
-import dev.architectury.platform.Platform;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
@@ -17,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
@@ -26,6 +23,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.HandlerThread;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,56 +54,38 @@ public final class Network {
 
     // --------------------------------------------------------------------- //
 
-    private static final Map<Class<?>, ResourceLocation> MESSAGE_IDS = new HashMap<>();
+    public static void register(RegisterPayloadHandlersEvent e) {
+        final PayloadRegistrar registrar = e.registrar("1");
+        final PayloadRegistrar onMain = registrar.executesOn(HandlerThread.MAIN);
 
-    // --------------------------------------------------------------------- //
+        onMain.playToClient(ServerCasingDataMessage.TYPE, ServerCasingDataMessage.STREAM_CODEC, ServerCasingDataMessage::handleMessage);
+        onMain.playToClient(CasingEnabledStateMessage.TYPE, CasingEnabledStateMessage.STREAM_CODEC, CasingEnabledStateMessage::handleMessage);
+        onMain.playToClient(CasingLockedStateMessage.TYPE, CasingLockedStateMessage.STREAM_CODEC, CasingLockedStateMessage::handleMessage);
+        onMain.playToClient(CasingInventoryMessage.TYPE, CasingInventoryMessage.STREAM_CODEC, CasingInventoryMessage::handleMessage);
+        onMain.playToClient(HaltAndCatchFireMessage.TYPE, HaltAndCatchFireMessage.STREAM_CODEC, HaltAndCatchFireMessage::handleMessage);
+        onMain.playToClient(RedstoneParticleEffectMessage.TYPE, RedstoneParticleEffectMessage.STREAM_CODEC, RedstoneParticleEffectMessage::handleMessage);
+        onMain.playToClient(ReceivingPipeLockedStateMessage.TYPE, ReceivingPipeLockedStateMessage.STREAM_CODEC, ReceivingPipeLockedStateMessage::handleMessage);
+        onMain.playToClient(ServerReadOnlyMemoryModuleDataMessage.TYPE, ServerReadOnlyMemoryModuleDataMessage.STREAM_CODEC, ServerReadOnlyMemoryModuleDataMessage::handleMessage);
+        onMain.playToClient(ControllerStateMessage.TYPE, ControllerStateMessage.STREAM_CODEC, ControllerStateMessage::handleMessage);
+        onMain.playToClient(ServerCasingInitializeMessage.TYPE, ServerCasingInitializeMessage.STREAM_CODEC, ServerCasingInitializeMessage::handleMessage);
 
-    public static void initialize() {
-        registerMessage(CodeBookDataMessage.class, CodeBookDataMessage::new, NetworkManager.clientToServer());
-        registerMessage(ServerCasingDataMessage.class, ServerCasingDataMessage::new, NetworkManager.serverToClient());
-        registerMessage(ClientCasingDataMessage.class, ClientCasingDataMessage::new, NetworkManager.clientToServer());
-        registerMessage(CasingEnabledStateMessage.class, CasingEnabledStateMessage::new, NetworkManager.serverToClient());
-        registerMessage(CasingLockedStateMessage.class, CasingLockedStateMessage::new, NetworkManager.serverToClient());
-        registerMessage(CasingInventoryMessage.class, CasingInventoryMessage::new, NetworkManager.serverToClient());
-        registerMessage(HaltAndCatchFireMessage.class, HaltAndCatchFireMessage::new, NetworkManager.serverToClient());
-        registerMessage(RedstoneParticleEffectMessage.class, RedstoneParticleEffectMessage::new, NetworkManager.serverToClient());
-        registerMessage(ReceivingPipeLockedStateMessage.class, ReceivingPipeLockedStateMessage::new, NetworkManager.serverToClient());
-        registerMessage(ServerReadOnlyMemoryModuleDataMessage.class, ServerReadOnlyMemoryModuleDataMessage::new, NetworkManager.serverToClient());
-        registerMessage(ClientReadOnlyMemoryModuleDataMessage.class, ClientReadOnlyMemoryModuleDataMessage::new, NetworkManager.clientToServer());
-        registerMessage(ControllerStateMessage.class, ControllerStateMessage::new, NetworkManager.serverToClient());
-        registerMessage(ClientCasingLoadedMessage.class, ClientCasingLoadedMessage::new, NetworkManager.clientToServer());
-        registerMessage(ServerCasingInitializeMessage.class, ServerCasingInitializeMessage::new, NetworkManager.serverToClient());
+        onMain.playToServer(CodeBookDataMessage.TYPE, CodeBookDataMessage.STREAM_CODEC, CodeBookDataMessage::handleMessage);
+        onMain.playToServer(ClientCasingDataMessage.TYPE, ClientCasingDataMessage.STREAM_CODEC, ClientCasingDataMessage::handleMessage);
+        onMain.playToServer(ClientReadOnlyMemoryModuleDataMessage.TYPE, ClientReadOnlyMemoryModuleDataMessage.STREAM_CODEC, ClientReadOnlyMemoryModuleDataMessage::handleMessage);
+        onMain.playToServer(ClientCasingLoadedMessage.TYPE, ClientCasingLoadedMessage.STREAM_CODEC, ClientCasingLoadedMessage::handleMessage);
 
-        TickEvent.SERVER_POST.register(server -> {
+        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post _e) -> {
             flushCasingQueues(Side.DEDICATED_SERVER);
             flushParticleQueue();
         });
-        if (Platform.getEnv() == EnvType.CLIENT) {
-            ClientTickEvent.CLIENT_POST.register(client -> flushCasingQueues(Side.CLIENT));
-        }
+        NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post _e) -> flushCasingQueues(Side.CLIENT));
     }
 
-    private static <T extends AbstractMessage> void registerMessage(final Class<T> type, final Function<FriendlyByteBuf, T> decoder, final NetworkManager.Side side) {
-        final ResourceLocation id = API.resource(type.getSimpleName().replaceAll("Message$", "").toLowerCase(Locale.US));
-        MESSAGE_IDS.put(type, id);
-        if (side != NetworkManager.serverToClient() || Platform.getEnv() == EnvType.CLIENT) {
-            NetworkManager.registerReceiver(side, id, (buffer, context) -> {
-                final T message = decoder.apply(buffer);
-                context.queue(() -> message.handleMessage(context));
-            });
-        }
-    }
 
     // --------------------------------------------------------------------- //
 
     public static void sendToPlayer(final ServerPlayer player, final AbstractMessage message) {
-        final var id = MESSAGE_IDS.get(message.getClass());
-        if (id == null) {
-            throw new IllegalArgumentException("Trying to send message with unregistered type.");
-        }
-        final var buffer = new FriendlyByteBuf(Unpooled.buffer());
-        message.toBytes(buffer);
-        NetworkManager.sendToPlayer(player, id, buffer);
+        PacketDistributor.sendToPlayer(player, message);
     }
 
     public static boolean sendToTrackingPlayers(final BlockEntity blockEntity, final AbstractMessage message) {
@@ -162,13 +148,7 @@ public final class Network {
     // --------------------------------------------------------------------- //
 
     public static void sendToServer(final AbstractMessage message) {
-        final var id = MESSAGE_IDS.get(message.getClass());
-        if (id == null) {
-            throw new IllegalArgumentException("Trying to send message with unregistered type.");
-        }
-        final var buffer = new FriendlyByteBuf(Unpooled.buffer());
-        message.toBytes(buffer);
-        NetworkManager.sendToServer(id, buffer);
+        PacketDistributor.sendToServer(message);
     }
 
     public static void sendModuleData(final CasingBlockEntity casing, final Face face, final CompoundTag data, final byte type) {
@@ -224,6 +204,10 @@ public final class Network {
         }
 
         particleQueue.clear();
+    }
+
+    public static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> type(String name) {
+        return new CustomPacketPayload.Type<>(API.resource(name));
     }
 
     /**

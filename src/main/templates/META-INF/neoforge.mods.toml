@@ -92,7 +92,7 @@ file="META-INF/accesstransformer.cfg"
 [[dependencies.${mod_id}]]
     modId = "markdown_manual"
     type = "required"
-    versionRange = "[${manual_version},)"
+
     ordering = "AFTER"
     side = "BOTH"
 

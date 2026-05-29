@@ -9,6 +9,7 @@ import li.cil.tis3d.common.container.Containers;
 import li.cil.tis3d.common.entity.Entities;
 import li.cil.tis3d.common.item.Items;
 import li.cil.tis3d.common.item.ModCreativeTabs;
+import li.cil.tis3d.common.network.Network;
 import li.cil.tis3d.common.provider.ModuleProviders;
 import li.cil.tis3d.common.provider.RedstoneInputProviders;
 import li.cil.tis3d.common.provider.SerialInterfaceProviders;
@@ -27,6 +28,7 @@ public final class CommonBootstrap {
         ConfigManager.initialize();
 
         bus.addListener(DataGenerators::gatherData);
+        bus.addListener(Network::register);
 
         RegistryUtils.begin(API.MOD_ID);
 
@@ -42,5 +44,7 @@ public final class CommonBootstrap {
         SerialInterfaceProviders.initialize(bus);
         RedstoneInputProviders.initialize(bus);
         ModCreativeTabs.initialize(bus);
+
+        RegistryUtils.finish(bus);
     }
 }

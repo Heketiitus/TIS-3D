@@ -1,7 +1,6 @@
 package li.cil.tis3d.util;
 
 import com.google.common.base.Strings;
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import li.cil.tis3d.util.config.*;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
@@ -40,19 +39,17 @@ public abstract class ConfigManager {
         STRING_CONVERTERS.put(double.class, Pair.of(o -> String.valueOf((double) o), Double::parseDouble));
         STRING_CONVERTERS.put(String.class, Pair.of(s -> (String) s, s -> s));
         STRING_CONVERTERS.put(UUID.class, Pair.of(Object::toString, UUID::fromString));
-        STRING_CONVERTERS.put(ResourceLocation.class, Pair.of(Object::toString, ResourceLocation::new));
+        STRING_CONVERTERS.put(ResourceLocation.class, Pair.of(Object::toString, ResourceLocation::parse));
     }
 
     // --------------------------------------------------------------------- //
 
-    @ExpectPlatform
     public static <T> void add(Supplier<T> factory) {
-        throw new AssertionError();
+        //TODO throw new AssertionError();
     }
 
-    @ExpectPlatform
     public static void initialize() {
-        throw new AssertionError();
+        //TODO throw new AssertionError();
     }
 
     // --------------------------------------------------------------------- //

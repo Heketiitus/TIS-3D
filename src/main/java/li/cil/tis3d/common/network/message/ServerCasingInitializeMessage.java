@@ -1,17 +1,25 @@
 package li.cil.tis3d.common.network.message;
 
-import dev.architectury.networking.NetworkManager;
 import li.cil.tis3d.api.machine.Casing;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.common.block.entity.CasingBlockEntity;
+import li.cil.tis3d.common.network.Network;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import static java.util.Objects.requireNonNull;
 
 public final class ServerCasingInitializeMessage extends AbstractMessageWithPosition {
+    public static final CustomPacketPayload.Type<ServerCasingInitializeMessage> TYPE = Network.type("casing_initialize");
+    public static final StreamCodec<RegistryFriendlyByteBuf, ServerCasingInitializeMessage> STREAM_CODEC = CustomPacketPayload.codec(
+        ServerCasingInitializeMessage::toBytes,
+        ServerCasingInitializeMessage::new
+    );
     private static final String MODULES_TAG = "modules";
 
     private ListTag tag;
@@ -21,7 +29,7 @@ public final class ServerCasingInitializeMessage extends AbstractMessageWithPosi
         this.tag = tag;
     }
 
-    public ServerCasingInitializeMessage(final FriendlyByteBuf buffer) {
+    public ServerCasingInitializeMessage(final RegistryFriendlyByteBuf buffer) {
         super(buffer);
     }
 
@@ -29,7 +37,7 @@ public final class ServerCasingInitializeMessage extends AbstractMessageWithPosi
     // AbstractMessage
 
     @Override
-    public void handleMessage(NetworkManager.PacketContext context) {
+    public void handleMessage(IPayloadContext context) {
         final var level = getClientLevel();
         if (level != null) {
             withBlockEntity(level, CasingBlockEntity.class, casing -> {
@@ -46,7 +54,7 @@ public final class ServerCasingInitializeMessage extends AbstractMessageWithPosi
     }
 
     @Override
-    public void fromBytes(FriendlyByteBuf buffer) {
+    public void fromBytes(RegistryFriendlyByteBuf buffer) {
         super.fromBytes(buffer);
 
         final var wrapper = requireNonNull(buffer.readNbt());
@@ -54,11 +62,16 @@ public final class ServerCasingInitializeMessage extends AbstractMessageWithPosi
     }
 
     @Override
-    public void toBytes(FriendlyByteBuf buffer) {
+    public void toBytes(RegistryFriendlyByteBuf buffer) {
         super.toBytes(buffer);
 
         final var wrapper = new CompoundTag();
         wrapper.put(MODULES_TAG, tag);
         buffer.writeNbt(wrapper);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

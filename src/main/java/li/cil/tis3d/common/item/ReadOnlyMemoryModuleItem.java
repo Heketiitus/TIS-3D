@@ -17,6 +17,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
+import java.nio.ByteBuffer;
 
 public final class ReadOnlyMemoryModuleItem extends ModuleItem {
     private static final String TAG_DATA = "data";
@@ -32,7 +33,7 @@ public final class ReadOnlyMemoryModuleItem extends ModuleItem {
     @Override
     public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand hand) {
         if (!level.isClientSide() && player instanceof final ServerPlayer serverPlayer) {
-            MenuRegistry.openExtendedMenu(serverPlayer, new MenuProvider() {
+            serverPlayer.openMenu(new MenuProvider() {
                 @Override
                 public Component getDisplayName() {
                     return Component.empty();
@@ -44,6 +45,7 @@ public final class ReadOnlyMemoryModuleItem extends ModuleItem {
                 }
             }, buffer -> buffer.writeEnum(hand));
         }
+
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 
@@ -54,18 +56,6 @@ public final class ReadOnlyMemoryModuleItem extends ModuleItem {
 
     // --------------------------------------------------------------------- //
 
-    /**
-     * Load ROM data from the specified tag.
-     *
-     * @param tag the tag to load the data from.
-     * @return the data loaded from the tag.
-     */
-    public static byte[] loadFromTag(@Nullable final CompoundTag tag) {
-        if (tag != null) {
-            return tag.getByteArray(TAG_DATA);
-        }
-        return EMPTY_DATA;
-    }
 
     /**
      * Load ROM data from the specified item stack.
@@ -74,7 +64,7 @@ public final class ReadOnlyMemoryModuleItem extends ModuleItem {
      * @return the data loaded from the stack.
      */
     public static byte[] loadFromStack(final ItemStack stack) {
-        return loadFromTag(stack.getTag());
+        return stack.get(DataComponentTypes.ROM_DATA_COMPONENT).array();
     }
 
     /**
@@ -84,14 +74,6 @@ public final class ReadOnlyMemoryModuleItem extends ModuleItem {
      * @param data  the data to save to the item stack.
      */
     public static void saveToStack(final ItemStack stack, final byte[] data) {
-        final CompoundTag tag = stack.getOrCreateTag();
-
-        byte[] tagData = tag.getByteArray(TAG_DATA);
-        if (tagData.length != data.length) {
-            tagData = new byte[data.length];
-        }
-
-        System.arraycopy(data, 0, tagData, 0, data.length);
-        tag.putByteArray(TAG_DATA, tagData);
+        stack.set(DataComponentTypes.ROM_DATA_COMPONENT, ByteBuffer.wrap(data));
     }
 }

@@ -75,8 +75,6 @@ public final class CodeBookItem extends ModItem {
 
 
         private static final String CONTINUATION_MACRO = "#BWTM";
-        private static final String TAG_PAGES = "pages";
-        private static final String TAG_SELECTED = "selected";
 
         private final List<List<String>> pages = new ArrayList<>();
         private int selectedPage = 0;

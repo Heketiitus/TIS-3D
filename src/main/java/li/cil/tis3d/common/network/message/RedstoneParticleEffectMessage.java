@@ -1,11 +1,21 @@
 package li.cil.tis3d.common.network.message;
 
-import dev.architectury.networking.NetworkManager;
+import li.cil.tis3d.common.network.Network;
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public final class RedstoneParticleEffectMessage extends AbstractMessage {
+    public static final CustomPacketPayload.Type<RedstoneParticleEffectMessage> TYPE = Network.type("redstone_particle_effect");
+    public static final StreamCodec<RegistryFriendlyByteBuf, RedstoneParticleEffectMessage> STREAM_CODEC = CustomPacketPayload.codec(
+        RedstoneParticleEffectMessage::toBytes,
+        RedstoneParticleEffectMessage::new
+    );
+
     private double x;
     private double y;
     private double z;
@@ -16,7 +26,7 @@ public final class RedstoneParticleEffectMessage extends AbstractMessage {
         this.z = z;
     }
 
-    public RedstoneParticleEffectMessage(final FriendlyByteBuf buffer) {
+    public RedstoneParticleEffectMessage(final RegistryFriendlyByteBuf buffer) {
         super(buffer);
     }
 
@@ -24,7 +34,7 @@ public final class RedstoneParticleEffectMessage extends AbstractMessage {
     // AbstractMessage
 
     @Override
-    public void handleMessage(final NetworkManager.PacketContext context) {
+    public void handleMessage(final IPayloadContext context) {
         final Level level = getClientLevel();
         if (level != null) {
             level.addParticle(DustParticleOptions.REDSTONE, x, y, z, 0, 0, 0);
@@ -32,16 +42,21 @@ public final class RedstoneParticleEffectMessage extends AbstractMessage {
     }
 
     @Override
-    public void fromBytes(final FriendlyByteBuf buffer) {
+    public void fromBytes(final RegistryFriendlyByteBuf buffer) {
         x = buffer.readDouble();
         y = buffer.readDouble();
         z = buffer.readDouble();
     }
 
     @Override
-    public void toBytes(final FriendlyByteBuf buffer) {
+    public void toBytes(final RegistryFriendlyByteBuf buffer) {
         buffer.writeDouble(x);
         buffer.writeDouble(y);
         buffer.writeDouble(z);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return type();
     }
 }

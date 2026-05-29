@@ -1,19 +1,15 @@
 package li.cil.tis3d.common.entity;
 
-import dev.architectury.extensions.network.EntitySpawnExtension;
-import dev.architectury.injectables.annotations.ExpectPlatform;
-import dev.architectury.networking.NetworkManager;
 import li.cil.tis3d.api.infrared.InfraredPacket;
 import li.cil.tis3d.api.infrared.InfraredReceiver;
+import li.cil.tis3d.common.capabilities.Capabilities;
 import li.cil.tis3d.common.event.InfraredPacketTickHandler;
 import li.cil.tis3d.common.module.InfraredModule;
 import li.cil.tis3d.util.Raytracing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -25,9 +21,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
+import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -36,7 +32,7 @@ import java.util.Optional;
 /**
  * Represents a single value in transmission, sent by an {@link InfraredModule}.
  */
-public final class InfraredPacketEntity extends Entity implements EntitySpawnExtension, InfraredPacket {
+public final class InfraredPacketEntity extends Entity implements IEntityWithComplexSpawn, InfraredPacket {
     // --------------------------------------------------------------------- //
     // Computed data
 
@@ -110,8 +106,8 @@ public final class InfraredPacketEntity extends Entity implements EntitySpawnExt
     // --------------------------------------------------------------------- //
 
     @Override
-    protected void defineSynchedData() {
-        getEntityData().define(DATA_VALUE, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_VALUE, 0);
         if (!level().isClientSide()) {
             InfraredPacketTickHandler.watchPacket(this);
         }
@@ -143,11 +139,6 @@ public final class InfraredPacketEntity extends Entity implements EntitySpawnExt
     protected void addAdditionalSaveData(final CompoundTag tag) {
         tag.putInt(TAG_LIFETIME, lifetime);
         tag.putShort(TAG_VALUE, value);
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkManager.createAddEntityPacket(this);
     }
 
     @Override
@@ -200,11 +191,13 @@ public final class InfraredPacketEntity extends Entity implements EntitySpawnExt
     // EntitySpawnExtension
 
     @Override
-    public void saveAdditionalSpawnData(FriendlyByteBuf buf) {
+    public void writeSpawnData(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+
     }
 
     @Override
-    public void loadAdditionalSpawnData(FriendlyByteBuf buf) {
+    public void readSpawnData(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+
     }
 
     // --------------------------------------------------------------------- //
@@ -337,15 +330,16 @@ public final class InfraredPacketEntity extends Entity implements EntitySpawnExt
         final Block block = blockState.getBlock();
 
         // Traveling through a portal?
+        // TODO
         final BlockEntity blockEntity = level().getBlockEntity(pos);
         if (blockState.is(Blocks.NETHER_PORTAL)) {
-            handleInsidePortal(pos);
+            //handleInsidePortal(pos);
             return;
         } else if (blockState.is(Blocks.END_GATEWAY)) {
-            if (blockEntity instanceof final TheEndGatewayBlockEntity endGateway && TheEndGatewayBlockEntity.canEntityTeleport(this)) {
-                TheEndGatewayBlockEntity.teleportEntity(level(), pos, blockState, this, endGateway);
-                return;
-            }
+            //if (blockEntity instanceof final TheEndGatewayBlockEntity endGateway && TheEndGatewayBlockEntity.canEntityTeleport(this)) {
+            //    TheEndGatewayBlockEntity.teleportEntity(level(), pos, blockState, this, endGateway);
+            //    return;
+            //}
         }
 
         // First things first, we ded.
@@ -372,13 +366,19 @@ public final class InfraredPacketEntity extends Entity implements EntitySpawnExt
         onPlatformEntityCollision(this, hit);
     }
 
-    @ExpectPlatform
-    private static void onPlatformBlockCollision(final InfraredPacketEntity packet, final BlockHitResult hit, @Nullable final BlockEntity blockEntity) {
-        throw new AssertionError();
+    public static void onPlatformBlockCollision(final InfraredPacketEntity packet, final BlockHitResult hit, @Nullable final BlockEntity blockEntity) {
+        if (blockEntity != null && blockEntity.getLevel() != null) {
+            final var capability = blockEntity.getLevel().getCapability(Capabilities.InfraredReceiver.BLOCK, blockEntity.getBlockPos(), hit.getDirection());
+            if (capability != null) {
+                capability.onInfraredPacket(packet, hit);
+            }
+        }
     }
 
-    @ExpectPlatform
-    private static void onPlatformEntityCollision(final InfraredPacketEntity packet, final EntityHitResult hit) {
-        throw new AssertionError();
+    public static void onPlatformEntityCollision(final InfraredPacketEntity packet, final EntityHitResult hit) {
+        final var capability = hit.getEntity().getCapability(Capabilities.InfraredReceiver.ENTITY);
+        if (capability != null) {
+            capability.onInfraredPacket(packet, hit);
+        }
     }
 }
