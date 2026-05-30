@@ -26,8 +26,6 @@ import li.cil.tis3d.util.EnumUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -167,10 +165,10 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
 
         // Code book? Store current program on it if sneaking.
         if (Items.is(heldItem, Items.BOOK_CODE) && player.isShiftKeyDown()) {
-            final CodeBookItem.Data data = CodeBookItem.Data.getFromStack(heldItem);
+            final CodeBookItem.MutableData data = CodeBookItem.MutableData.getFromStack(heldItem);
             if (getState().code != null && getState().code.length > 0) {
                 data.addOrSelectProgram(Arrays.asList(getState().code));
-                CodeBookItem.Data.setToStack(heldItem, data);
+                CodeBookItem.MutableData.setToStack(heldItem, data);
             }
 
             return true;
@@ -456,8 +454,8 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
         }
 
         @Override
-        public Iterable<String> codeFor(final ItemStack stack) {
-            final CodeBookItem.Data data = CodeBookItem.Data.getFromStack(stack);
+        public @Nullable Iterable<String> codeFor(final ItemStack stack) {
+            final CodeBookItem.MutableData data = CodeBookItem.MutableData.getFromStack(stack);
             if (data.getPageCount() < 1) {
                 return null;
             }

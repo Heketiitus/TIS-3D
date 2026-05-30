@@ -23,7 +23,7 @@ public final class CasingInventoryMessage extends AbstractMessageWithPosition {
     public static final StreamCodec<RegistryFriendlyByteBuf, CasingInventoryMessage> STREAM_CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC, CasingInventoryMessage::getPosition,
         ByteBufCodecs.INT, CasingInventoryMessage::getSlot,
-        ItemStack.STREAM_CODEC, CasingInventoryMessage::getStack,
+        ItemStack.OPTIONAL_STREAM_CODEC, CasingInventoryMessage::getStack,
         ByteBufCodecs.COMPOUND_TAG, CasingInventoryMessage::getModuleData,
         CasingInventoryMessage::new
     );
@@ -39,11 +39,7 @@ public final class CasingInventoryMessage extends AbstractMessageWithPosition {
         super(casing);
         this.slot = slot;
         this.stack = stack;
-        this.moduleData = moduleData;
-    }
-
-    public CasingInventoryMessage(final RegistryFriendlyByteBuf buffer) {
-        super(buffer);
+        this.moduleData = moduleData == null ? new CompoundTag() : moduleData;
     }
 
     // --------------------------------------------------------------------- //

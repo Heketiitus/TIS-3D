@@ -7,10 +7,6 @@ import li.cil.tis3d.common.block.CasingBlock;
 import li.cil.tis3d.common.config.Constants;
 import li.cil.tis3d.util.ClientSided;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -58,32 +54,40 @@ public final class CodeBookItem extends ModItem {
 
     // --------------------------------------------------------------------- //
 
-    /**
-     * Wrapper for list of pages stored in the code book.
-     */
-    public static class Data {
+    public record Data(List<List<String>> pages, int selectedPage) {
         public static final Codec<Data> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.list(Codec.list(Codec.STRING)).fieldOf("pages").forGetter(Data::getPages),
-            Codec.INT.fieldOf("selected").forGetter(Data::getSelectedPage)
+            Codec.list(Codec.list(Codec.STRING)).fieldOf("pages").forGetter(Data::pages),
+            Codec.INT.fieldOf("selected").forGetter(Data::selectedPage)
         ).apply(i, Data::new));
 
         public static final StreamCodec<FriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).apply(ByteBufCodecs.list()), Data::getPages,
-            ByteBufCodecs.INT, Data::getSelectedPage,
+            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()).apply(ByteBufCodecs.list()), Data::pages,
+            ByteBufCodecs.INT, Data::selectedPage,
             Data::new
         );
+    }
 
-
+    /**
+     * Wrapper for list of pages stored in the code book.
+     */
+    public static class MutableData {
         private static final String CONTINUATION_MACRO = "#BWTM";
-
         private final List<List<String>> pages = new ArrayList<>();
         private int selectedPage = 0;
 
         // --------------------------------------------------------------------- //
 
-        public Data(final List<List<String>> pages, final int selectedPage) {
+        public MutableData(final List<List<String>> pages, final int selectedPage) {
             this.pages.addAll(pages);
             this.selectedPage = selectedPage;
+        }
+
+        public MutableData(Data data) {
+            this(data.pages, data.selectedPage);
+        }
+
+        public MutableData() {
+
         }
 
 
@@ -256,10 +260,6 @@ public final class CodeBookItem extends ModItem {
             }
         }
 
-        public List<List<String>> getPages() {
-            return pages;
-        }
-
         // --------------------------------------------------------------------- //
 
         private void validateSelectedPage() {
@@ -278,6 +278,10 @@ public final class CodeBookItem extends ModItem {
             return true;
         }
 
+        public Data toImmutable() {
+            return new Data(Collections.unmodifiableList(pages), selectedPage);
+        }
+
         // --------------------------------------------------------------------- //
 
 
@@ -287,8 +291,9 @@ public final class CodeBookItem extends ModItem {
          * @param stack the item stack to load the data from.
          * @return the data loaded from the stack.
          */
-        public static @Nullable Data getFromStack(final ItemStack stack) {
-            return stack.get(DataComponentTypes.CODEBOOK_COMPONENT);
+        public static MutableData getFromStack(final ItemStack stack) {
+            var result = stack.get(DataComponentTypes.CODEBOOK_COMPONENT);
+            return result == null ? new MutableData() : new MutableData(result);
         }
 
         /**
@@ -297,10 +302,13 @@ public final class CodeBookItem extends ModItem {
          * @param stack the item stack to save the data to.
          * @param data  the data to save to the item stack.
          */
+        public static void setToStack(final ItemStack stack, final MutableData data) {
+            setToStack(stack, data.toImmutable());
+        }
+
         public static void setToStack(final ItemStack stack, final Data data) {
             stack.set(DataComponentTypes.CODEBOOK_COMPONENT, data);
         }
-
         // --------------------------------------------------------------------- //
 
         private static boolean isPartialProgram(final List<String> program) {

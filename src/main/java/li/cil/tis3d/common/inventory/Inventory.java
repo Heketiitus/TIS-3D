@@ -34,9 +34,9 @@ public class Inventory implements Container {
     public void save(final CompoundTag tag, HolderLookup.Provider provider) {
         final ListTag itemList = new ListTag();
         for (final ItemStack stack : items) {
-            final CompoundTag stackTag = new CompoundTag();
+            Tag stackTag = new CompoundTag();
             if (stack != null && !stack.isEmpty()) {
-                stack.save(provider, stackTag);
+                stackTag = stack.save(provider, stackTag);
             }
             itemList.add(stackTag);
         }

@@ -25,18 +25,6 @@ public abstract class MixinCasingBlockEntity extends BlockEntity {
         super(type, pos, state);
     }
 
-    @Unique
-    @SuppressWarnings("DataFlowIssue")
-    private CasingBlockEntity tis3d$asCasingBlockEntity() {
-        return (CasingBlockEntity) (Object) this;
-    }
-
-    @Override
-    public void onChunkUnloaded() {
-        super.onChunkUnloaded();
-        tis3d$asCasingBlockEntity().dispose();
-    }
-
     @Override
     public @NotNull ModelData getModelData() {
         final ModelData modelData = super.getModelData();

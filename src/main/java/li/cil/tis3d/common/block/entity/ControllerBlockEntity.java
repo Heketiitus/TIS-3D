@@ -147,6 +147,7 @@ public final class ControllerBlockEntity extends ComputerBlockEntity {
         super(BlockEntities.CONTROLLER.get(), pos, state);
     }
 
+    @Override
     public void dispose() {
         // Just unset from our casings, do *not* disable them to keep their state.
         for (final CasingBlockEntity casing : casings) {

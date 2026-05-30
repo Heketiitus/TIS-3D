@@ -19,7 +19,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -64,7 +63,7 @@ public final class CodeBookScreen extends Screen {
 
     private final Player player;
     private final InteractionHand hand;
-    private final CodeBookItem.Data data;
+    private final CodeBookItem.MutableData data;
     private final List<StringBuilder> lines = new ArrayList<>();
 
     private int guiX = 0;
@@ -79,7 +78,7 @@ public final class CodeBookScreen extends Screen {
         super(Component.literal("Code Book"));
         this.player = player;
         this.hand = hand;
-        this.data = CodeBookItem.Data.getFromStack(player.getItemInHand(InteractionHand.MAIN_HAND));
+        this.data = CodeBookItem.MutableData.getFromStack(player.getItemInHand(InteractionHand.MAIN_HAND));
 
         rebuildLines();
     }
@@ -108,7 +107,7 @@ public final class CodeBookScreen extends Screen {
         saveProgram();
 
         // Save any changes made and send them to the server.
-        Network.sendToServer(new CodeBookDataMessage(hand, data));
+        Network.sendToServer(new CodeBookDataMessage(hand, data.toImmutable()));
     }
 
     @Override

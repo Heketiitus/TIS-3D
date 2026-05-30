@@ -15,6 +15,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.NoteBlockEvent;
 
 import javax.annotation.Nullable;
 
@@ -120,8 +122,15 @@ public final class AudioModule extends AbstractModule {
 
     public record Note(int id, NoteBlockInstrument instrument) { }
 
-    @Nullable
-    private static Note transformNote(final AudioModule module, final Note note) {
-        throw new AssertionError();
+
+    public static @Nullable AudioModule.Note transformNote(final AudioModule module, final AudioModule.Note note) {
+        final var level = module.getCasing().getCasingLevel();
+        final var pos = module.getCasing().getPosition();
+        final NoteBlockEvent.Play event = new NoteBlockEvent.Play(level, pos, level.getBlockState(pos), note.id(), note.instrument());
+        if (NeoForge.EVENT_BUS.post(event).isCanceled()) {
+            return null; // Cancelled.
+        }
+
+        return new AudioModule.Note(event.getVanillaNoteId(), event.getInstrument());
     }
 }

@@ -6,6 +6,7 @@ import li.cil.tis3d.client.ClientSetup;
 import li.cil.tis3d.client.manual.Manuals;
 import li.cil.tis3d.common.CommonBootstrap;
 import li.cil.tis3d.common.CommonSetup;
+import li.cil.tis3d.util.RegistryUtils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -14,7 +15,7 @@ import net.neoforged.fml.loading.FMLEnvironment;
 @Mod(API.MOD_ID)
 public class BootstrapNeoForge {
     public BootstrapNeoForge(final IEventBus modEventBus) {
-        ModEventBus.INSTANCE = modEventBus;
+        RegistryUtils.begin(API.MOD_ID);
         CommonBootstrap.setup(modEventBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             Manuals.initialize(modEventBus);
@@ -23,5 +24,6 @@ public class BootstrapNeoForge {
 
         modEventBus.addListener(ClientSetup::setup);
         modEventBus.addListener(CommonSetup::setup);
+        RegistryUtils.finish(modEventBus);
     }
 }

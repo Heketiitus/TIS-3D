@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -183,6 +184,11 @@ public abstract class ComputerBlockEntity extends BlockEntity implements PipeHos
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
+    @Override
+    public void onChunkUnloaded() {
+        dispose();
+    }
+
     // --------------------------------------------------------------------- //
 
     public void checkNeighbors() {
@@ -257,6 +263,9 @@ public abstract class ComputerBlockEntity extends BlockEntity implements PipeHos
     boolean hasNeighbor(final Face face) {
         return neighbors[face.ordinal()] != null;
     }
+
+    @ApiStatus.Internal
+    protected void dispose() {}
 
     void rebuildOverrides() {
         // Reset to initial state before checking for inter-block connections.

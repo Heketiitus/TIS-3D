@@ -57,6 +57,6 @@ public final class RedstoneParticleEffectMessage extends AbstractMessage {
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
-        return type();
+        return TYPE;
     }
 }

@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class RegistryUtils {
-    private static final List<net.neoforged.neoforge.registries.DeferredRegister<?>> ENTRIES = new ArrayList();
-    private static final List<RegistryBuilder<?>> BUILDERS = new ArrayList();
+    private static final List<RegistryBuilder<?>> BUILDERS = new ArrayList<>();
     private static RegistryUtils.Phase phase;
     private static String modId;
 
@@ -27,13 +26,11 @@ public abstract class RegistryUtils {
         }
     }
 
-    public static <T> net.neoforged.neoforge.registries.DeferredRegister<T> getDeferred(ResourceKey<Registry<T>> registryKey) {
+    public static <T> DeferredRegister<T> getDeferred(ResourceKey<Registry<T>> registryKey) {
         if (phase != RegistryUtils.Phase.INIT) {
             throw new IllegalStateException();
         } else {
-            net.neoforged.neoforge.registries.DeferredRegister<T> entry = net.neoforged.neoforge.registries.DeferredRegister.create(registryKey, modId);
-            ENTRIES.add(entry);
-            return entry;
+            return DeferredRegister.create(registryKey, modId);
         }
     }
 
@@ -54,8 +51,10 @@ public abstract class RegistryUtils {
         if (phase != Phase.INIT) throw new IllegalStateException();
         phase = Phase.POST_INIT;
 
-        bus.addListener((NewRegistryEvent e) -> BUILDERS.forEach(e::create));
-        BUILDERS.clear();
+        bus.addListener((NewRegistryEvent e) -> {
+            BUILDERS.forEach(e::create);
+            BUILDERS.clear();
+        });
     }
 
     private RegistryUtils() {

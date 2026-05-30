@@ -5,7 +5,6 @@ import li.cil.tis3d.util.RegistryUtils;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.util.ExtraCodecs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -25,7 +24,7 @@ public class DataComponentTypes {
         );
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<CodeBookItem.Data>> CODEBOOK_COMPONENT =
-        DATA_COMPONENT_TYPES.register("key", () -> DataComponentType.<CodeBookItem.Data>builder()
+        DATA_COMPONENT_TYPES.register("codebook", () -> DataComponentType.<CodeBookItem.Data>builder()
             .persistent(CodeBookItem.Data.CODEC)
             .networkSynchronized(CodeBookItem.Data.STREAM_CODEC)
             .build()

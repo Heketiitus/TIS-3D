@@ -65,7 +65,7 @@ public final class ReadOnlyMemoryModuleScreen extends AbstractContainerScreen<Re
     @Override
     public void render(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
-        final MultiBufferSource.BufferSource buffer = Constants.IMMEDIATE_BUFFER;
+        final MultiBufferSource.BufferSource buffer = graphics.bufferSource();
 
         // Draw row and column headers.
         drawHeaders(graphics, buffer);

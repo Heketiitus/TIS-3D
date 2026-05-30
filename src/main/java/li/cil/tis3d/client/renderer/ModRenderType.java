@@ -2,7 +2,9 @@ package li.cil.tis3d.client.renderer;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import li.cil.manual.api.util.Constants;
 import li.cil.tis3d.api.API;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -13,7 +15,7 @@ public abstract class ModRenderType extends RenderType {
     private static final RenderType UNLIT_ATLAS_TEXTURE = create("atlas_module_overlay",
         DefaultVertexFormat.POSITION_TEX_COLOR,
         builder -> builder
-            .setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
+            .setShaderState(Constants.POSITION_TEX_COLOR)
             .setTextureState(BLOCK_SHEET_MIPPED));
 
     private static final RenderType UNLIT = create("module_overlay",

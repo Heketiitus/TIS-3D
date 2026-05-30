@@ -86,6 +86,7 @@ public final class CasingBlockEntity extends ComputerBlockEntity implements Side
     }
 
     @ApiStatus.Internal
+    @Override
     public void dispose() {
         if (getController() != null) {
             getController().scheduleScan();
