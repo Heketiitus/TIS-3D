@@ -88,8 +88,8 @@ public final class ModRecipesProvider extends RecipeProvider {
             .save(consumer);
         module(Items.REDSTONE_MODULE, 2, net.minecraft.world.item.Items.REPEATER, inventoryChange(Tags.Items.DUSTS_REDSTONE))
             .save(consumer);
-        // TODO module(Items.SEQUENCER_MODULE, 2, ItemTags.MUSIC_DISCS, inventoryChange(Items.QUEUE_MODULE.get()))
-        //    .save(consumer);
+        module(Items.SEQUENCER_MODULE, 2, Tags.Items.MUSIC_DISCS, inventoryChange(Items.QUEUE_MODULE.get()))
+            .save(consumer);
         module(Items.SERIAL_PORT_MODULE, 2, Tags.Items.GEMS_QUARTZ, inventoryChange(Items.EXECUTION_MODULE.get()))
             .save(consumer);
         module(Items.STACK_MODULE, 2, Tags.Items.CHESTS, inventoryChange(Items.REDSTONE_MODULE.get()))

@@ -3,6 +3,8 @@ package li.cil.tis3d.util.neoforge;
 import li.cil.tis3d.util.ConfigManager;
 import li.cil.tis3d.util.config.ConfigType;
 import li.cil.tis3d.util.config.Type;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -28,7 +30,7 @@ public final class ConfigManagerImpl extends ConfigManager {
         CONFIGS.put(config.getValue(), createDefinition(config.getKey(), values));
     }
 
-    public static void initialize() {
+    public static void initialize(ModContainer modContainer, IEventBus bus) {
         CONFIGS.forEach((spec, config) -> {
             final Type typeAnnotation = config.instance().getClass().getAnnotation(Type.class);
             final ConfigType configType = typeAnnotation != null ? typeAnnotation.value() : ConfigType.COMMON;
@@ -37,10 +39,10 @@ public final class ConfigManagerImpl extends ConfigManager {
                 case CLIENT -> ModConfig.Type.CLIENT;
                 case SERVER -> ModConfig.Type.SERVER;
             };
-            //TODO ModLoadingContext.get().registerConfig(platformType, spec);
+            modContainer.registerConfig(platformType, spec);
         });
 
-        //TODO ModEventBus.INSTANCE.addListener(ConfigManagerImpl::handleModConfigEvent);
+        bus.addListener(ConfigManagerImpl::handleModConfigEvent);
     }
 
     // --------------------------------------------------------------------- //

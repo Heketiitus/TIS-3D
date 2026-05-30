@@ -44,16 +44,6 @@ public abstract class ConfigManager {
 
     // --------------------------------------------------------------------- //
 
-    public static <T> void add(Supplier<T> factory) {
-        //TODO throw new AssertionError();
-    }
-
-    public static void initialize() {
-        //TODO throw new AssertionError();
-    }
-
-    // --------------------------------------------------------------------- //
-
     protected static <T> void fillSpec(final T instance, final Builder builder, final ArrayList<ConfigFieldPair<?>> values) {
         for (final Field field : instance.getClass().getFields()) {
             parseField(instance, builder, values, field);

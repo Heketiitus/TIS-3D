@@ -19,14 +19,16 @@ import li.cil.tis3d.common.tags.ItemTags;
 import li.cil.tis3d.data.DataGenerators;
 import li.cil.tis3d.util.ConfigManager;
 import li.cil.tis3d.util.RegistryUtils;
+import li.cil.tis3d.util.neoforge.ConfigManagerImpl;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.NeoForge;
 
 public final class CommonBootstrap {
-    public static void setup(IEventBus bus) {
-        ConfigManager.add(CommonConfig::new);
-        ConfigManager.add(ClientConfig::new);
-        ConfigManager.initialize();
+    public static void setup(ModContainer modContainer, IEventBus bus) {
+        ConfigManagerImpl.add(CommonConfig::new);
+        ConfigManagerImpl.add(ClientConfig::new);
+        ConfigManagerImpl.initialize(modContainer, bus);
 
         bus.addListener(DataGenerators::gatherData);
         bus.addListener(Network::register);

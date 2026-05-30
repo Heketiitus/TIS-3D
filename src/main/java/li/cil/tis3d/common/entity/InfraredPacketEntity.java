@@ -20,7 +20,10 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EndGatewayBlock;
+import net.minecraft.world.level.block.Portal;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
@@ -330,17 +333,14 @@ public final class InfraredPacketEntity extends Entity implements IEntityWithCom
         final Block block = blockState.getBlock();
 
         // Traveling through a portal?
-        // TODO
-        final BlockEntity blockEntity = level().getBlockEntity(pos);
-        if (blockState.is(Blocks.NETHER_PORTAL)) {
-            //handleInsidePortal(pos);
+        // TODO doesnt work?
+        if (block instanceof Portal p) {
+            setAsInsidePortal(p, pos);
+            handlePortal();
             return;
-        } else if (blockState.is(Blocks.END_GATEWAY)) {
-            //if (blockEntity instanceof final TheEndGatewayBlockEntity endGateway && TheEndGatewayBlockEntity.canEntityTeleport(this)) {
-            //    TheEndGatewayBlockEntity.teleportEntity(level(), pos, blockState, this, endGateway);
-            //    return;
-            //}
         }
+
+        final BlockEntity blockEntity = level().getBlockEntity(pos);
 
         // First things first, we ded.
         discard();
