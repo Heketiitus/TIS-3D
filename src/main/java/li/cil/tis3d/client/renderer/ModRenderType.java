@@ -58,7 +58,7 @@ public abstract class ModRenderType extends RenderType {
         return create("texture_module_overlay",
             DefaultVertexFormat.POSITION_TEX_COLOR,
             builder -> builder
-                .setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
+                .setShaderState(Constants.POSITION_TEX_COLOR)
                 .setTextureState(new TextureStateShard(texture, false, false)));
     }
 
