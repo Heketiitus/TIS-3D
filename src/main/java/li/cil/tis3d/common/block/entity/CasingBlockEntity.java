@@ -10,6 +10,8 @@ import li.cil.tis3d.api.module.Module;
 import li.cil.tis3d.api.module.traits.ModuleWithBlockChangeListener;
 import li.cil.tis3d.api.module.traits.ModuleWithRedstone;
 import li.cil.tis3d.api.module.traits.ModuleWithRotation;
+import li.cil.tis3d.api.module.traits.neoforge.ModuleWithBakedModelNeoForge;
+import li.cil.tis3d.client.renderer.block.neoforge.ModuleBakedModel;
 import li.cil.tis3d.common.config.CommonConfig;
 import li.cil.tis3d.common.inventory.CasingInventory;
 import li.cil.tis3d.common.inventory.SidedInventoryProxy;
@@ -36,6 +38,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
@@ -489,6 +492,33 @@ public final class CasingBlockEntity extends ComputerBlockEntity implements Side
     @ClientSided
     public void setReceivingPipeLockedClient(final Face face, final Port port, final boolean value) {
         locked[face.ordinal()][port.ordinal()] = value;
+    }
+
+    @Override
+    @ClientSided
+    public ModelData getModelData() {
+        final ModelData modelData = super.getModelData();
+        if (level == null) {
+            return modelData;
+        }
+
+        final ModuleBakedModel.CasingModules data = new ModuleBakedModel.CasingModules();
+        for (final Face face : Face.VALUES) {
+            final Module module = casing.getModule(face);
+            if (module instanceof final ModuleWithBakedModelNeoForge moduleWithModel) {
+                if (moduleWithModel.hasModel()) {
+                    data.setModule(face, moduleWithModel, moduleWithModel.getModelData(level, getBlockPos(), getBlockState(), modelData));
+                }
+            }
+        }
+
+        if (!data.isEmpty()) {
+            return ModelData.builder()
+                .with(ModuleBakedModel.CasingModules.CASING_MODULES_PROPERTY, data)
+                .build();
+        }
+
+        return modelData;
     }
 
     // --------------------------------------------------------------------- //

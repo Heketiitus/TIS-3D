@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -35,6 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
@@ -220,6 +222,19 @@ public class CasingBlock extends BaseEntityBlock {
             }
             super.onRemove(state, level, pos, newState, isMoving);
         }
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(final BlockState state, final HitResult hit, final LevelReader level, final BlockPos pos, final Player player) {
+        // Allow picking modules installed in the casing.
+        final BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof final CasingBlockEntity casing && hit instanceof final BlockHitResult blockHit) {
+            final ItemStack stack = casing.getItem(blockHit.getDirection().ordinal());
+            if (!stack.isEmpty()) {
+                return stack.copy();
+            }
+        }
+        return super.getCloneItemStack(state, hit, level, pos, player);
     }
 
     // --------------------------------------------------------------------- //
