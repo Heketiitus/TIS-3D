@@ -1,6 +1,5 @@
 package li.cil.tis3d.common;
 
-import li.cil.tis3d.api.API;
 import li.cil.tis3d.client.ClientConfig;
 import li.cil.tis3d.common.block.Blocks;
 import li.cil.tis3d.common.block.entity.BlockEntities;
@@ -17,12 +16,9 @@ import li.cil.tis3d.common.provider.SerialInterfaceProviders;
 import li.cil.tis3d.common.tags.BlockTags;
 import li.cil.tis3d.common.tags.ItemTags;
 import li.cil.tis3d.data.DataGenerators;
-import li.cil.tis3d.util.ConfigManager;
-import li.cil.tis3d.util.RegistryUtils;
 import li.cil.tis3d.util.neoforge.ConfigManagerImpl;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.neoforge.common.NeoForge;
 
 public final class CommonBootstrap {
     public static void setup(ModContainer modContainer, IEventBus bus) {

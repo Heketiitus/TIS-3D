@@ -13,7 +13,6 @@ import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.gui.TerminalModuleScreen;
 import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -27,6 +26,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -221,7 +222,7 @@ public final class TerminalModule extends AbstractModuleWithRotation {
         }
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         if (!getCasing().isEnabled() || !isVisible()) {
@@ -303,7 +304,7 @@ public final class TerminalModule extends AbstractModuleWithRotation {
     // --------------------------------------------------------------------- //
     // Rendering
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void renderText(final RenderContext context) {
         final PoseStack matrixStack = context.getMatrixStack();
         matrixStack.translate(2f / 16f, 2f / 16f, 0);
@@ -323,7 +324,7 @@ public final class TerminalModule extends AbstractModuleWithRotation {
         renderInput(context, fontRenderer, textWidth);
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void renderDisplay(final RenderContext context, final FontRenderer fontRenderer) {
         final PoseStack matrixStack = context.getMatrixStack();
         for (final StringBuilder line : display) {
@@ -332,7 +333,7 @@ public final class TerminalModule extends AbstractModuleWithRotation {
         }
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void renderInput(final RenderContext context, final FontRenderer fontRenderer, final int textWidth) {
         final PoseStack matrixStack = context.getMatrixStack();
 
@@ -352,12 +353,12 @@ public final class TerminalModule extends AbstractModuleWithRotation {
         }
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void openScreen() {
         Minecraft.getInstance().setScreen(new TerminalModuleScreen(this));
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void closeGui() {
         final Minecraft mc = Minecraft.getInstance();
         final Screen screen = mc.screen;

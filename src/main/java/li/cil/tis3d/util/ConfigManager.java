@@ -1,7 +1,15 @@
 package li.cil.tis3d.util;
 
 import com.google.common.base.Strings;
-import li.cil.tis3d.util.config.*;
+import li.cil.tis3d.util.config.Comment;
+import li.cil.tis3d.util.config.CustomSerializer;
+import li.cil.tis3d.util.config.ItemType;
+import li.cil.tis3d.util.config.KeyValueTypes;
+import li.cil.tis3d.util.config.Max;
+import li.cil.tis3d.util.config.Min;
+import li.cil.tis3d.util.config.Path;
+import li.cil.tis3d.util.config.Translation;
+import li.cil.tis3d.util.config.WorldRestart;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -14,10 +22,15 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public abstract class ConfigManager {
     private static final Logger LOGGER = LogManager.getLogger();

@@ -8,7 +8,6 @@ import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.Color;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -17,6 +16,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.Optional;
 
@@ -156,7 +157,7 @@ public final class KeypadModule extends AbstractModuleWithRotation {
         }
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         if (!getCasing().isEnabled() || !isVisible()) {

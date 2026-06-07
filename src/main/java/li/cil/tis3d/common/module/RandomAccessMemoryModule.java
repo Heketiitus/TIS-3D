@@ -11,7 +11,6 @@ import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.common.item.Items;
 import li.cil.tis3d.common.item.ReadOnlyMemoryModuleItem;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.Color;
 import li.cil.tis3d.util.EnumUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -19,6 +18,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.Arrays;
 
@@ -157,7 +158,7 @@ public class RandomAccessMemoryModule extends AbstractModuleWithRotation {
         }
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         if (!getCasing().isEnabled() || !isVisible()) {
@@ -223,7 +224,7 @@ public class RandomAccessMemoryModule extends AbstractModuleWithRotation {
     /**
      * Get the color of the memory cells for this module.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     protected int getCellColor() {
         return 0xFFBBDDFF;
     }

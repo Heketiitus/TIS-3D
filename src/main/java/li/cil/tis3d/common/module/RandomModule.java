@@ -7,9 +7,10 @@ import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.prefab.module.AbstractModule;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.util.ClientSided;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 public final class RandomModule extends AbstractModule {
     public RandomModule(final Casing casing, final Face face) {
@@ -35,7 +36,7 @@ public final class RandomModule extends AbstractModule {
         stepOutput(port);
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         if (!getCasing().isEnabled()) {

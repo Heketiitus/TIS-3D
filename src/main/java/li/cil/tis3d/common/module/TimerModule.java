@@ -12,9 +12,10 @@ import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.Color;
 import net.minecraft.nbt.CompoundTag;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * The timer module can be used to wait for a specific amount of game time.
@@ -90,7 +91,7 @@ public final class TimerModule extends AbstractModuleWithRotation {
         hasElapsed = false; // Recompute in render().
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         if (!getCasing().isEnabled()) {
@@ -192,7 +193,7 @@ public final class TimerModule extends AbstractModuleWithRotation {
         getCasing().sendData(getFace(), data, DATA_TYPE_UPDATE);
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void drawState(final RenderContext context, final float remaining) {
         final float milliseconds = remaining * 50f; // One tick is 50ms.
         final float seconds = milliseconds / 1000f;

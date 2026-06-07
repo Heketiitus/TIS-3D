@@ -1,6 +1,10 @@
 package li.cil.tis3d.client;
 
-import li.cil.tis3d.util.config.*;
+import li.cil.tis3d.util.config.Comment;
+import li.cil.tis3d.util.config.ConfigType;
+import li.cil.tis3d.util.config.Path;
+import li.cil.tis3d.util.config.Translation;
+import li.cil.tis3d.util.config.Type;
 
 @Type(ConfigType.CLIENT)
 public final class ClientConfig {

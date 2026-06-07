@@ -1,6 +1,5 @@
 package li.cil.tis3d.common.network.message;
 
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 

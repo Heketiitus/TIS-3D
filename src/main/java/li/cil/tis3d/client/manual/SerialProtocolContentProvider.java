@@ -6,10 +6,14 @@ import li.cil.manual.api.prefab.provider.NamespaceDocumentProvider;
 import li.cil.tis3d.api.API;
 import li.cil.tis3d.api.serial.SerialInterfaceProvider;
 import li.cil.tis3d.api.serial.SerialProtocolDocumentationReference;
-import li.cil.tis3d.common.provider.SerialInterfaceProviders;
 import li.cil.tis3d.util.RegistryUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 

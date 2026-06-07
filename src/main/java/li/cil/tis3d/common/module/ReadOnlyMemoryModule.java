@@ -4,8 +4,9 @@ import li.cil.tis3d.api.machine.Casing;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Pipe;
 import li.cil.tis3d.common.item.ReadOnlyMemoryModuleItem;
-import li.cil.tis3d.util.ClientSided;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * The RAM module can be used to store up to 256 values by address. It runs
@@ -53,7 +54,7 @@ public final class ReadOnlyMemoryModule extends RandomAccessMemoryModule {
         }
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     protected int getCellColor() {
         return 0xFFCCFFCC;

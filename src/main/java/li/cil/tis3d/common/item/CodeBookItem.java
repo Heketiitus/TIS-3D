@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import li.cil.tis3d.client.gui.CodeBookScreen;
 import li.cil.tis3d.common.block.CasingBlock;
 import li.cil.tis3d.common.config.Constants;
-import li.cil.tis3d.util.ClientSided;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -17,9 +16,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * The code book, utility book for coding ASM programs for execution modules.
@@ -47,7 +51,7 @@ public final class CodeBookItem extends ModItem {
 
     // --------------------------------------------------------------------- //
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void openScreen(final Player player, final InteractionHand hand) {
         Minecraft.getInstance().setScreen(new CodeBookScreen(player, hand));
     }

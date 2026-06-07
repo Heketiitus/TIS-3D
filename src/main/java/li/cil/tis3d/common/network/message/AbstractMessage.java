@@ -1,11 +1,11 @@
 package li.cil.tis3d.common.network.message;
 
-import li.cil.tis3d.util.ClientSided;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +36,7 @@ public abstract class AbstractMessage implements CustomPacketPayload {
         return sender != null ? sender.level() : null;
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Nullable
     protected Level getClientLevel() {
         return Minecraft.getInstance().level;

@@ -2,7 +2,6 @@ package li.cil.tis3d.common.item;
 
 import li.cil.tis3d.common.block.CasingBlock;
 import li.cil.tis3d.common.container.ReadOnlyMemoryModuleContainer;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -16,7 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
-import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 public final class ReadOnlyMemoryModuleItem extends ModuleItem {

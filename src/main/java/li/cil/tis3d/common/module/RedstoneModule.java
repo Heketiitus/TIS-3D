@@ -11,11 +11,12 @@ import li.cil.tis3d.api.module.traits.ModuleWithRedstone;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.Color;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 public final class RedstoneModule extends AbstractModuleWithRotation implements ModuleWithRedstone {
     // --------------------------------------------------------------------- //
@@ -106,7 +107,7 @@ public final class RedstoneModule extends AbstractModuleWithRotation implements 
         output = data.readShort();
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         final PoseStack matrixStack = context.getMatrixStack();

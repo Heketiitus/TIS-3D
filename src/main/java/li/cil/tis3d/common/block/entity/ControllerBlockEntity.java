@@ -6,7 +6,6 @@ import li.cil.tis3d.common.config.CommonConfig;
 import li.cil.tis3d.common.network.Network;
 import li.cil.tis3d.common.network.message.ControllerStateMessage;
 import li.cil.tis3d.common.network.message.HaltAndCatchFireMessage;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.LevelUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,8 +20,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * The controller tile entity.
@@ -380,7 +388,7 @@ public final class ControllerBlockEntity extends ComputerBlockEntity {
     // --------------------------------------------------------------------- //
     // Synchronization
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     public void setStateClient(final ControllerState state) {
         this.state = state;
     }

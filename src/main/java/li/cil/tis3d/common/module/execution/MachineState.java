@@ -9,7 +9,11 @@ import li.cil.tis3d.common.module.execution.instruction.Instruction;
 import li.cil.tis3d.util.EnumUtils;
 import net.minecraft.nbt.CompoundTag;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Virtual machine state for executing TIS-100 assembly.

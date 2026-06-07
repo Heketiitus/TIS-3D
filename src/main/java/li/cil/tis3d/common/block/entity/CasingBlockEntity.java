@@ -23,7 +23,6 @@ import li.cil.tis3d.common.network.message.CasingLockedStateMessage;
 import li.cil.tis3d.common.network.message.ClientCasingLoadedMessage;
 import li.cil.tis3d.common.network.message.ReceivingPipeLockedStateMessage;
 import li.cil.tis3d.common.provider.RedstoneInputProviders;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.InventoryUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -38,11 +37,17 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Tile entity for casings.
@@ -447,7 +452,7 @@ public final class CasingBlockEntity extends ComputerBlockEntity implements Side
      *
      * @param locked the new locked state of the case.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     public void setCasingLockedClient(final boolean locked) {
         casing.setLocked(locked);
     }
@@ -461,7 +466,7 @@ public final class CasingBlockEntity extends ComputerBlockEntity implements Side
      * @param stack      the new item stack in that slot, if any.
      * @param moduleData the original state of the module on the server, if present.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     public void setStackAndModuleClient(final int slot, final ItemStack stack, final CompoundTag moduleData) {
         inventory.setItem(slot, stack);
         final Module module = casing.getModule(Face.VALUES[slot]);
@@ -476,7 +481,7 @@ public final class CasingBlockEntity extends ComputerBlockEntity implements Side
      *
      * @param value the new enabled state of this casing.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     public void setEnabledClient(final boolean value) {
         isEnabled = value;
     }
@@ -489,13 +494,13 @@ public final class CasingBlockEntity extends ComputerBlockEntity implements Side
      * @param port  the port to set the locked state of.
      * @param value the new enabled state of this casing.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     public void setReceivingPipeLockedClient(final Face face, final Port port, final boolean value) {
         locked[face.ordinal()][port.ordinal()] = value;
     }
 
     @Override
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     public ModelData getModelData() {
         final ModelData modelData = super.getModelData();
         if (level == null) {

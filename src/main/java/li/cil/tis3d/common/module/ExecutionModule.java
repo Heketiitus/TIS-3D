@@ -20,7 +20,6 @@ import li.cil.tis3d.common.module.execution.MachineState;
 import li.cil.tis3d.common.module.execution.compiler.Compiler;
 import li.cil.tis3d.common.module.execution.compiler.ParseException;
 import li.cil.tis3d.common.module.execution.compiler.Strings;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.Color;
 import li.cil.tis3d.util.EnumUtils;
 import net.minecraft.core.BlockPos;
@@ -34,9 +33,14 @@ import net.minecraft.world.item.component.WritableBookContent;
 import net.minecraft.world.item.component.WrittenBookContent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * The programmable execution module.
@@ -59,7 +63,7 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
         WAIT
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private static final class RenderData {
         private static final ResourceLocation[] STATE_LOCATIONS = new ResourceLocation[]{
             Textures.LOCATION_OVERLAY_MODULE_EXECUTION_IDLE,
@@ -229,7 +233,7 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
         state = State.values()[data.readByte()];
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         if ((!getCasing().isEnabled() || !isVisible()) && !this.isHitFace(context.getDispatcher().cameraHitResult)) {
@@ -333,7 +337,7 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
         getCasing().sendData(getFace(), data, DATA_TYPE_INCREMENTAL);
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void renderState(final RenderContext context, final MachineState machineState) {
         final PoseStack matrixStack = context.getMatrixStack();
         matrixStack.pushPose();
@@ -402,7 +406,7 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
      *
      * @param height the height of the line to draw.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private static void drawLine(final RenderContext context, final int height, final int color) {
         context.drawQuadUnlit(-0.5f, -0.5f, 72, height + 1, color);
     }

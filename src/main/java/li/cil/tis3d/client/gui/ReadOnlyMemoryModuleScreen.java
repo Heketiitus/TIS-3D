@@ -1,8 +1,5 @@
 package li.cil.tis3d.client.gui;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
-import li.cil.manual.api.util.Constants;
 import li.cil.tis3d.api.API;
 import li.cil.tis3d.client.renderer.Textures;
 import li.cil.tis3d.common.container.ReadOnlyMemoryModuleContainer;

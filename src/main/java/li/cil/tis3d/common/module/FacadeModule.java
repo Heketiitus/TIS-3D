@@ -6,7 +6,6 @@ import li.cil.tis3d.api.module.traits.ModuleWithBakedModel;
 import li.cil.tis3d.api.module.traits.ModuleWithBlockChangeListener;
 import li.cil.tis3d.api.prefab.module.AbstractModule;
 import li.cil.tis3d.util.BlockStateUtils;
-import li.cil.tis3d.util.ClientSided;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -23,6 +22,8 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.OptionalInt;
@@ -130,7 +131,7 @@ public final class FacadeModule extends AbstractModule implements ModuleWithBloc
         return facadeState != null;
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public OptionalInt getTintColor(@Nullable final BlockAndTintGetter level, @Nullable final BlockPos pos, final int tintIndex) {
         return OptionalInt.of(Minecraft.getInstance().getBlockColors().getColor(facadeState, level, pos, tintIndex));

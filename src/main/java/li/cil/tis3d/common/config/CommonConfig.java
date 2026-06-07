@@ -1,6 +1,10 @@
 package li.cil.tis3d.common.config;
 
-import li.cil.tis3d.util.config.*;
+import li.cil.tis3d.util.config.Comment;
+import li.cil.tis3d.util.config.Max;
+import li.cil.tis3d.util.config.Min;
+import li.cil.tis3d.util.config.Path;
+import li.cil.tis3d.util.config.Translation;
 
 /**
  * User configurable stuff via config file.

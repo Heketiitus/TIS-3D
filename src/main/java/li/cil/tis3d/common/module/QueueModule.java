@@ -12,10 +12,11 @@ import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.Color;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * The queue module can be used to store a number of values to be retrieved
@@ -101,7 +102,7 @@ public final class QueueModule extends AbstractModuleWithRotation {
         }
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         if (!getCasing().isEnabled()) {
@@ -262,7 +263,7 @@ public final class QueueModule extends AbstractModuleWithRotation {
         getCasing().sendData(getFace(), data, DATA_TYPE_UPDATE);
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void drawState(final RenderContext context) {
         final PoseStack matrixStack = context.getMatrixStack();
 

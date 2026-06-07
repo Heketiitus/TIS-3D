@@ -13,7 +13,6 @@ import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.ModRenderType;
-import li.cil.tis3d.util.ClientSided;
 import li.cil.tis3d.util.Color;
 import li.cil.tis3d.util.EnumUtils;
 import net.minecraft.client.Minecraft;
@@ -24,6 +23,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ABGR32;
 import net.minecraft.util.FastColor.ARGB32;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.Arrays;
 
@@ -88,19 +89,19 @@ public final class DisplayModule extends AbstractModuleWithRotation {
     private static final byte DATA_TYPE_CLEAR = 0;
 
     // Running counter for unique dynamic texture ids.
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private static int nextTextureId;
 
     // Backing texture used to render the module data.
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private DynamicTexture texture;
 
     // Id of the backing texture, required by MC dynamic texture system.
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private ResourceLocation textureId;
 
     // Render layer we render our texture in.
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private RenderType renderLayer;
 
     // --------------------------------------------------------------------- //
@@ -148,7 +149,7 @@ public final class DisplayModule extends AbstractModuleWithRotation {
         imageDirty = true;
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(final RenderContext context) {
         if (!getCasing().isEnabled()) {
@@ -254,7 +255,7 @@ public final class DisplayModule extends AbstractModuleWithRotation {
      *
      * @return the texture used to upload data to the GPU.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private DynamicTexture getOrCreateTexture() {
         if (texture == null) {
             texture = new DynamicTexture(RESOLUTION, RESOLUTION, false);
@@ -263,7 +264,7 @@ public final class DisplayModule extends AbstractModuleWithRotation {
         return texture;
     }
 
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private RenderType getOrCreateRenderLayer() {
         if (renderLayer == null) {
             final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
@@ -279,7 +280,7 @@ public final class DisplayModule extends AbstractModuleWithRotation {
     /**
      * Deletes our texture from the GPU, if we have one.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void deleteTexture() {
         if (textureId != null) {
             Minecraft.getInstance().doRunTask(() -> {
@@ -298,7 +299,7 @@ public final class DisplayModule extends AbstractModuleWithRotation {
     /**
      * Uploads new image data if it changed, creates texture if necessary.
      */
-    @ClientSided
+    @OnlyIn(Dist.CLIENT)
     private void validateTexture() {
         if (!imageDirty) {
             return;
