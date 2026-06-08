@@ -3,16 +3,16 @@
   "category": "misc",
   "key": {
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "P": {
-      "tag": "forge:glass_panes/colorless"
+      "tag": "c:glass_panes/colorless"
     },
     "R": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     },
     "S": {
-      "item": "minecraft:note_block"
+      "item": "minecraft:paper"
     }
   },
   "pattern": [
@@ -21,7 +21,7 @@
     " R "
   ],
   "result": {
-    "count": 2,
-    "item": "tis3d:audio_module"
+    "count": 8,
+    "id": "tis3d:facade_module"
   }
 }
