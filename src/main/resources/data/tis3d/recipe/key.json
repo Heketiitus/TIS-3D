@@ -3,19 +3,19 @@
   "category": "equipment",
   "key": {
     "G": {
-      "tag": "forge:nuggets/gold"
+      "tag": "c:nuggets/gold"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "L": {
-      "tag": "forge:gems/lapis"
+      "tag": "c:gems/lapis"
     },
     "Q": {
-      "tag": "forge:gems/quartz"
+      "tag": "c:gems/quartz"
     },
     "R": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     }
   },
   "pattern": [
@@ -24,6 +24,6 @@
     "LRQ"
   ],
   "result": {
-    "item": "tis3d:key"
+    "id": "tis3d:key"
   }
 }

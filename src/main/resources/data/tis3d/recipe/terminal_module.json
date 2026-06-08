@@ -3,22 +3,22 @@
   "category": "misc",
   "key": {
     "D": {
-      "item": "tis3d:display_module"
+      "id": "tis3d:display_module"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "K": {
-      "item": "tis3d:keypad_module"
+      "id": "tis3d:keypad_module"
     },
     "Q": {
-      "tag": "forge:gems/quartz"
+      "tag": "c:gems/quartz"
     },
     "R": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     },
     "S": {
-      "item": "tis3d:stack_module"
+      "id": "tis3d:stack_module"
     }
   },
   "pattern": [
@@ -27,6 +27,6 @@
     " R "
   ],
   "result": {
-    "item": "tis3d:terminal_module"
+    "id": "tis3d:terminal_module"
   }
 }
