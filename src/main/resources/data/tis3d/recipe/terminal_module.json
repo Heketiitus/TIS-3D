@@ -3,13 +3,13 @@
   "category": "misc",
   "key": {
     "D": {
-      "id": "tis3d:display_module"
+      "item": "tis3d:display_module"
     },
     "I": {
       "tag": "c:ingots/iron"
     },
     "K": {
-      "id": "tis3d:keypad_module"
+      "item": "tis3d:keypad_module"
     },
     "Q": {
       "tag": "c:gems/quartz"
@@ -18,7 +18,7 @@
       "tag": "c:dusts/redstone"
     },
     "S": {
-      "id": "tis3d:stack_module"
+      "item": "tis3d:stack_module"
     }
   },
   "pattern": [

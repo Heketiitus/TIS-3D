@@ -12,7 +12,7 @@
       "tag": "c:dusts/redstone"
     },
     "S": {
-      "id": "minecraft:spider_eye"
+      "item": "minecraft:spider_eye"
     }
   },
   "pattern": [

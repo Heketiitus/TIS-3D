@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "id": "tis3d:queue_module"
+      "item": "tis3d:queue_module"
     }
   ],
   "result": {
