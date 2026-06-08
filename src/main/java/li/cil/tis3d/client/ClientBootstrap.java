@@ -26,5 +26,6 @@ public final class ClientBootstrap {
             e.register(Containers.READ_ONLY_MEMORY_MODULE.get(), ReadOnlyMemoryModuleScreen::new));
 
         bus.addListener(ClientSetup::handleModelRegistryEvent);
+        bus.addListener(ClientSetup::setup);
     }
 }

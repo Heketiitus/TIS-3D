@@ -7,10 +7,10 @@ import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Pipe;
 import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.module.traits.ModuleWithBakedModel;
 import li.cil.tis3d.api.module.traits.ModuleWithBlockChangeListener;
 import li.cil.tis3d.api.module.traits.ModuleWithRedstone;
 import li.cil.tis3d.api.module.traits.ModuleWithRotation;
-import li.cil.tis3d.api.module.traits.neoforge.ModuleWithBakedModelNeoForge;
 import li.cil.tis3d.client.renderer.block.neoforge.ModuleBakedModel;
 import li.cil.tis3d.common.config.CommonConfig;
 import li.cil.tis3d.common.inventory.CasingInventory;
@@ -510,7 +510,7 @@ public final class CasingBlockEntity extends ComputerBlockEntity implements Side
         final ModuleBakedModel.CasingModules data = new ModuleBakedModel.CasingModules();
         for (final Face face : Face.VALUES) {
             final Module module = casing.getModule(face);
-            if (module instanceof final ModuleWithBakedModelNeoForge moduleWithModel) {
+            if (module instanceof final ModuleWithBakedModel moduleWithModel) {
                 if (moduleWithModel.hasModel()) {
                     data.setModule(face, moduleWithModel, moduleWithModel.getModelData(level, getBlockPos(), getBlockState(), modelData));
                 }

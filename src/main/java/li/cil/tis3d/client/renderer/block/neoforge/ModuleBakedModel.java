@@ -1,7 +1,7 @@
 package li.cil.tis3d.client.renderer.block.neoforge;
 
 import li.cil.tis3d.api.machine.Face;
-import li.cil.tis3d.api.module.traits.neoforge.ModuleWithBakedModelNeoForge;
+import li.cil.tis3d.api.module.traits.ModuleWithBakedModel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -36,17 +36,19 @@ public final class ModuleBakedModel implements IDynamicBakedModel {
     @Override
     public @NotNull List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction side, final RandomSource random, final ModelData data, @Nullable final RenderType renderType) {
         final CasingModules modules = data.get(CasingModules.CASING_MODULES_PROPERTY);
+        boolean isSolidRenderType = renderType != null && renderType.equals(RenderType.solid());
+
         if (side != null) {
             if (modules != null) {
                 final Face face = Face.fromDirection(side);
-                final ModuleWithBakedModelNeoForge module = modules.getModule(face);
+                final ModuleWithBakedModel module = modules.getModule(face);
                 if (module != null && module.hasModel()) {
                     final ModelData moduleData = modules.getModuleData(face);
                     return module.getQuads(state, side, random, moduleData, renderType);
                 }
             }
 
-            if (renderType != null && renderType.equals(RenderType.solid())) {
+            if (isSolidRenderType) {
                 return proxy.getQuads(state, side, random, data, renderType);
             } else {
                 return Collections.emptyList();
@@ -56,7 +58,7 @@ public final class ModuleBakedModel implements IDynamicBakedModel {
 
             if (modules != null) {
                 for (final Face face : Face.VALUES) {
-                    final ModuleWithBakedModelNeoForge module = modules.getModule(face);
+                    final ModuleWithBakedModel module = modules.getModule(face);
                     if (module != null && module.hasModel()) {
                         final ModelData moduleData = modules.getModuleData(face);
                         quads.addAll(module.getQuads(state, null, random, moduleData, renderType));
@@ -64,7 +66,7 @@ public final class ModuleBakedModel implements IDynamicBakedModel {
                 }
             }
 
-            if (renderType != null && renderType.equals(RenderType.solid())) {
+            if (isSolidRenderType) {
                 quads.addAll(proxy.getQuads(state, null, random, data, renderType));
             }
 
@@ -109,7 +111,7 @@ public final class ModuleBakedModel implements IDynamicBakedModel {
         final CasingModules modules = data.get(CasingModules.CASING_MODULES_PROPERTY);
         if (modules != null) {
             for (final Face face : Face.VALUES) {
-                final ModuleWithBakedModelNeoForge module = modules.getModule(face);
+                final ModuleWithBakedModel module = modules.getModule(face);
                 if (module != null && module.hasModel()) {
                     final ModelData moduleData = modules.getModuleData(face);
                     set = ChunkRenderTypeSet.union(set, module.getRenderTypes(random, moduleData));
@@ -124,11 +126,11 @@ public final class ModuleBakedModel implements IDynamicBakedModel {
     public static final class CasingModules {
         public static final ModelProperty<CasingModules> CASING_MODULES_PROPERTY = new ModelProperty<>();
 
-        private final ModuleWithBakedModelNeoForge[] modules = new ModuleWithBakedModelNeoForge[Face.VALUES.length];
+        private final ModuleWithBakedModel[] modules = new ModuleWithBakedModel[Face.VALUES.length];
         private final ModelData[] moduleData = new ModelData[Face.VALUES.length];
 
         public boolean isEmpty() {
-            for (final ModuleWithBakedModelNeoForge module : modules) {
+            for (final ModuleWithBakedModel module : modules) {
                 if (module != null) {
                     return false;
                 }
@@ -137,13 +139,13 @@ public final class ModuleBakedModel implements IDynamicBakedModel {
             return true;
         }
 
-        public void setModule(final Face face, final ModuleWithBakedModelNeoForge module, final ModelData data) {
+        public void setModule(final Face face, final ModuleWithBakedModel module, final ModelData data) {
             modules[face.ordinal()] = module;
             moduleData[face.ordinal()] = data;
         }
 
         @Nullable
-        public ModuleWithBakedModelNeoForge getModule(final Face face) {
+        public ModuleWithBakedModel getModule(final Face face) {
             return modules[face.ordinal()];
         }
 

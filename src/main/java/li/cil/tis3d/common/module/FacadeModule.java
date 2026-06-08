@@ -5,13 +5,18 @@ import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.module.traits.ModuleWithBakedModel;
 import li.cil.tis3d.api.module.traits.ModuleWithBlockChangeListener;
 import li.cil.tis3d.api.prefab.module.AbstractModule;
+import li.cil.tis3d.common.block.entity.CasingBlockEntity;
 import li.cil.tis3d.util.BlockStateUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -24,8 +29,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.ChunkRenderTypeSet;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.OptionalInt;
 
 public final class FacadeModule extends AbstractModule implements ModuleWithBlockChangeListener, ModuleWithBakedModel {
@@ -86,6 +97,10 @@ public final class FacadeModule extends AbstractModule implements ModuleWithBloc
         final BlockPos position = getCasing().getPosition();
         final BlockState state = level.getBlockState(position);
         level.sendBlockUpdated(position, state, state, Block.UPDATE_ALL);
+
+        if (getCasing() instanceof final CasingBlockEntity casing) {
+            casing.requestModelDataUpdate();
+        }
     }
 
     @Override
@@ -135,6 +150,27 @@ public final class FacadeModule extends AbstractModule implements ModuleWithBloc
     @Override
     public OptionalInt getTintColor(@Nullable final BlockAndTintGetter level, @Nullable final BlockPos pos, final int tintIndex) {
         return OptionalInt.of(Minecraft.getInstance().getBlockColors().getColor(facadeState, level, pos, tintIndex));
+    }
+
+    // --------------------------------------------------------------------- //
+    // ModuleWithBakedModel
+
+    @Override
+    public ModelData getModelData(final BlockAndTintGetter level, final BlockPos pos, final BlockState state, final ModelData data) {
+        final var model = Minecraft.getInstance().getBlockRenderer().getBlockModel(facadeState);
+        return model.getModelData(level, pos, facadeState, data);
+    }
+
+    @Override
+    public List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction face, final RandomSource random, final ModelData data, final @Nullable RenderType renderType) {
+        final var model = Minecraft.getInstance().getBlockRenderer().getBlockModel(facadeState);
+        return model.getQuads(facadeState, face, random, data, renderType);
+    }
+
+    @Override
+    public ChunkRenderTypeSet getRenderTypes(final RandomSource random, final ModelData data) {
+        final var model = Minecraft.getInstance().getBlockRenderer().getBlockModel(facadeState);
+        return model.getRenderTypes(facadeState, random, data);
     }
 
     // --------------------------------------------------------------------- //
