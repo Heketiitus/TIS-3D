@@ -1,9 +1,8 @@
-package li.cil.tis3d.client.renderer.module;
+package li.cil.tis3d.api.prefab.module;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Port;
-import li.cil.tis3d.api.module.ModuleRenderer;
 import li.cil.tis3d.api.module.traits.ModuleWithRotation;
 import li.cil.tis3d.util.ClientSided;
 import org.joml.Quaternionf;

@@ -1,9 +1,12 @@
 package li.cil.tis3d.client.renderer.module;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotationRenderer;
 import li.cil.tis3d.api.util.RenderContext;
-import li.cil.tis3d.common.module.DisplayModule;
+import li.cil.tis3d.client.renderer.Textures;
 import li.cil.tis3d.common.module.RedstoneModule;
+import li.cil.tis3d.util.Color;
 
 public class RedstoneModuleRenderer extends AbstractModuleWithRotationRenderer<RedstoneModule> {
 
@@ -23,24 +26,24 @@ public class RedstoneModuleRenderer extends AbstractModuleWithRotationRenderer<R
 
     @Override
     public void render(final RedstoneModule module, final RenderContext context) {
-/*
         if (!module.getCasing().isEnabled()) {
             return;
         }
-final PoseStack matrixStack = context.getMatrixStack();
+
+        final PoseStack matrixStack = context.getMatrixStack();
         matrixStack.pushPose();
-        rotateForRendering(matrixStack);
+        rotateForRendering(module, matrixStack);
 
         // Draw base overlay.
         context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE);
 
-        if (!getCasing().isEnabled()) {
+        if (!module.getCasing().isEnabled()) {
             matrixStack.popPose();
             return;
         }
 
         // Draw output bar.
-        final float relativeOutput = output / 15f;
+        final float relativeOutput = module.getRedstoneOutput() / 15f;
         final float heightOutput = relativeOutput * SHARED_H;
         final float v0Output = SHARED_Y - heightOutput;
         context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE_BARS,
@@ -49,7 +52,7 @@ final PoseStack matrixStack = context.getMatrixStack();
             Color.WHITE);
 
         // Draw input bar.
-        final float relativeInput = input / 15f;
+        final float relativeInput = module.getRedstoneInput() / 15f;
         final float heightInput = relativeInput * SHARED_H;
         final float v0Input = SHARED_Y - heightInput;
         context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE_BARS,
@@ -58,6 +61,5 @@ final PoseStack matrixStack = context.getMatrixStack();
             Color.WHITE);
 
         matrixStack.popPose();
- */
     }
 }

@@ -1,41 +1,70 @@
 package li.cil.tis3d.client.renderer.module;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import li.cil.manual.api.render.FontRenderer;
+import li.cil.tis3d.api.API;
 import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotationRenderer;
 import li.cil.tis3d.api.util.RenderContext;
-import li.cil.tis3d.common.module.DisplayModule;
+import li.cil.tis3d.client.renderer.Textures;
+import li.cil.tis3d.common.module.TimerModule;
+import li.cil.tis3d.util.Color;
 
-public class TimerModuleRenderer extends AbstractModuleWithRotationRenderer<DisplayModule> {
+public class TimerModuleRenderer extends AbstractModuleWithRotationRenderer<TimerModule> {
 
     @Override
     public boolean matches(Module module) {
-        return module instanceof DisplayModule;
+        return module instanceof TimerModule;
     }
 
     @Override
-    public void render(final DisplayModule module, final RenderContext context) {
-        /*
-if (!getCasing().isEnabled()) {
+    public void render(final TimerModule module, final RenderContext context) {
+        if (!module.getCasing().isEnabled()) {
             return;
         }
 
         final PoseStack matrixStack = context.getMatrixStack();
         matrixStack.pushPose();
-        rotateForRendering(matrixStack);
+        rotateForRendering(module, matrixStack);
 
         context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_TIMER);
 
         // Render detailed state when player is close.
-        if (!hasElapsed && context.closeEnoughForDetails(getCasing().getPosition())) {
+        if (!module.hasElapsed() && context.closeEnoughForDetails(module.getCasing().getPosition())) {
             final long gameTime = context.getDispatcher().level.getGameTime();
-            final float remaining = (float) (timer - gameTime) - context.getPartialTicks();
+            final float remaining = (float) (module.getTimer() - gameTime) - context.getPartialTicks();
             if (remaining <= 0) {
-                hasElapsed = true;
+                module.elapsed();
             } else {
-                drawState(context, remaining);
+                drawState(module, context, remaining);
             }
         }
 
         matrixStack.popPose();
-         */
+    }
+
+    private void drawState(final TimerModule module, final RenderContext context, final float remaining) {
+        final float milliseconds = remaining * 50f; // One tick is 50ms.
+        final float seconds = milliseconds / 1000f;
+        final int minutes = (int) (seconds / 60f);
+
+        final String time;
+        if (minutes > 0) {
+            time = String.format("%d:%02d", minutes, (int) seconds % 60);
+        } else {
+            time = String.format("%.2f", seconds);
+        }
+
+        final FontRenderer fontRenderer = API.normalFontRenderer;
+
+        final int width = fontRenderer.width(time);
+        final int height = fontRenderer.lineHeight();
+
+        final PoseStack matrixStack = context.getMatrixStack();
+        matrixStack.translate(0.5f, 0.5f, 0);
+        matrixStack.scale(1 / 80f, 1 / 80f, 1);
+        matrixStack.translate(-width / 2f + 1, -height / 2f + 1, 0);
+
+        context.drawString(fontRenderer, time, Color.WHITE);
     }
 }

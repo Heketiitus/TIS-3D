@@ -4,13 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.manual.api.render.FontRenderer;
 import li.cil.tis3d.api.API;
 import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotationRenderer;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.common.module.FacadeModule;
 import li.cil.tis3d.common.module.StackModule;
 import li.cil.tis3d.util.Color;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public class StackModuleRenderer extends AbstractModuleWithRotationRenderer<StackModule> {
 

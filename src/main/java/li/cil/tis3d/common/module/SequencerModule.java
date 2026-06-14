@@ -1,6 +1,5 @@
 package li.cil.tis3d.common.module;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import li.cil.tis3d.api.machine.Casing;
@@ -8,36 +7,19 @@ import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Pipe;
 import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
-import li.cil.tis3d.api.util.RenderContext;
-import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.util.Color;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public final class SequencerModule extends AbstractModuleWithRotation {
-    // Rendering info.
-    private static final float CELLS_U0 = 5 / 32f;
-    private static final float CELLS_V0 = 5 / 32f;
-    private static final float CELLS_SIZE_U = 1 / 32f;
-    private static final float CELLS_SIZE_V = 1 / 32f;
-    private static final float CELLS_STEP_U = CELLS_SIZE_U + 2 / 32f;
-    private static final float CELLS_STEP_V = CELLS_SIZE_V + 2 / 32f;
-    private static final float CELLS_OUTER_U0 = 8 / 64f;
-    private static final float CELLS_OUTER_V0 = 8 / 64f;
-    private static final float CELLS_OUTER_SIZE_U = 6 / 64f;
-    private static final float CELLS_OUTER_SIZE_V = 6 / 64f;
-    private static final float CELLS_OUTER_STEP_U = CELLS_OUTER_SIZE_U;
-    private static final float CELLS_OUTER_STEP_V = CELLS_OUTER_SIZE_V;
-    private static final float BAR_U0 = 8 / 64f;
-    private static final float BAR_V0 = 8 / 64f;
-    private static final float BAR_SIZE_U = 6 / 64f;
-    private static final float BAR_SIZE_V = 48 / 64f;
-    private static final float BAR_STEP_U = BAR_SIZE_U;
+    public static final float CELLS_OUTER_U0 = 8 / 64f;
+    public static final float CELLS_OUTER_V0 = 8 / 64f;
+    public static final float CELLS_OUTER_SIZE_U = 6 / 64f;
+    public static final float CELLS_OUTER_SIZE_V = 6 / 64f;
+    public static final float CELLS_OUTER_STEP_U = CELLS_OUTER_SIZE_U;
+    public static final float CELLS_OUTER_STEP_V = CELLS_OUTER_SIZE_V;
 
     // --------------------------------------------------------------------- //
     // Persisted data
@@ -60,8 +42,8 @@ public final class SequencerModule extends AbstractModuleWithRotation {
     private static final byte DATA_TYPE_CONFIGURATION = 0;
     private static final byte DATA_TYPE_POSITION = 1;
 
-    private static final int COL_COUNT = 8;
-    private static final int ROW_COUNT = 8;
+    public static final int COL_COUNT = 8;
+    public static final int ROW_COUNT = 8;
 
     private short output;
 
@@ -69,6 +51,22 @@ public final class SequencerModule extends AbstractModuleWithRotation {
 
     public SequencerModule(final Casing casing, final Face face) {
         super(casing, face);
+    }
+
+    public boolean isConfigured(int col, int row) {
+        return configuration[col][row];
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public int getStepsRemaining() {
+        return stepsRemaining;
     }
 
     // --------------------------------------------------------------------- //
@@ -231,7 +229,7 @@ public final class SequencerModule extends AbstractModuleWithRotation {
         }
     }
 
-    private int uvToCol(final float u) {
+    public int uvToCol(final float u) {
         if (u < CELLS_OUTER_U0 || u > CELLS_OUTER_U0 + CELLS_OUTER_STEP_U * COL_COUNT) {
             return -1;
         }
@@ -240,7 +238,7 @@ public final class SequencerModule extends AbstractModuleWithRotation {
         return (int) (mappedU * COL_COUNT);
     }
 
-    private int uvToRow(final float v) {
+    public int uvToRow(final float v) {
         if (v < CELLS_OUTER_V0 || v > CELLS_OUTER_V0 + CELLS_OUTER_STEP_V * ROW_COUNT) {
             return -1;
         }

@@ -118,6 +118,10 @@ public final class RedstoneModule extends AbstractModuleWithRotation implements 
     // --------------------------------------------------------------------- //
     // Redstone
 
+    public int getRedstoneInput() {
+        return input;
+    }
+
     @Override
     public short getRedstoneOutput() {
         return output;

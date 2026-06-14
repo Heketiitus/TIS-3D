@@ -40,17 +40,14 @@ public final class KeypadModule extends AbstractModuleWithRotation {
     // Data packet types.
     private static final byte DATA_TYPE_VALUE = 0;
 
-    // Color of hovered/focused button highlight.
-    private static final int HIGHLIGHT_COLOR = Color.withAlpha(Color.WHITE, 0.5f);
-
     // Rendering info.
-    private static final float KEYS_U0 = 5 / 32f;
-    private static final float KEYS_V0 = 5 / 32f;
-    private static final float KEYS_SIZE_U = 5 / 32f;
-    private static final float KEYS_SIZE_V = 5 / 32f;
-    private static final float KEYS_SIZE_V_LAST = 4 / 32f;
-    private static final float KEYS_STEP_U = 6 / 32f;
-    private static final float KEYS_STEP_V = 6 / 32f;
+    public static final float KEYS_U0 = 5 / 32f;
+    public static final float KEYS_V0 = 5 / 32f;
+    public static final float KEYS_SIZE_U = 5 / 32f;
+    public static final float KEYS_SIZE_V = 5 / 32f;
+    public static final float KEYS_SIZE_V_LAST = 4 / 32f;
+    public static final float KEYS_STEP_U = 6 / 32f;
+    public static final float KEYS_STEP_V = 6 / 32f;
 
     // Pitch lookup for click feedback sound cue per value, 0-9.
     // Roughly based on telephone keypad frequencies, except we have to mush
@@ -61,6 +58,10 @@ public final class KeypadModule extends AbstractModuleWithRotation {
 
     public KeypadModule(final Casing casing, final Face face) {
         super(casing, face);
+    }
+
+    public Optional<Short> getValue() {
+        return value;
     }
 
     // --------------------------------------------------------------------- //
@@ -188,7 +189,7 @@ public final class KeypadModule extends AbstractModuleWithRotation {
         }
     }
 
-    private int uvToButton(final float u, final float v) {
+    public int uvToButton(final float u, final float v) {
         if (u < KEYS_U0 || u > KEYS_U0 + KEYS_STEP_U * 2 + KEYS_SIZE_U) {
             return -1;
         }
@@ -233,18 +234,7 @@ public final class KeypadModule extends AbstractModuleWithRotation {
         return button;
     }
 
-    private short buttonToNumber(final int button) {
+    public static short buttonToNumber(final int button) {
         return (short) ((button + 1) % 10);
-    }
-
-    private void drawButtonOverlay(final RenderContext context, final int button) {
-        final int column = button % 3;
-        final int row = button / 3;
-        final float x = KEYS_U0 + column * KEYS_STEP_U;
-        final float y = KEYS_V0 + row * KEYS_STEP_V;
-        final float w = buttonToNumber(button) == 0 ? (KEYS_SIZE_U + KEYS_STEP_U) : KEYS_SIZE_U;
-        final float h = row == 3 ? KEYS_SIZE_V_LAST : KEYS_SIZE_V;
-
-        context.drawQuadUnlit(x, y, w, h, HIGHLIGHT_COLOR);
     }
 }

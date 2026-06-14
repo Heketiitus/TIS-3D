@@ -2,8 +2,8 @@ package li.cil.tis3d.client.renderer.module;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotationRenderer;
 import li.cil.tis3d.api.util.RenderContext;
-import li.cil.tis3d.common.module.DisplayModule;
 import li.cil.tis3d.common.module.RandomAccessMemoryModule;
 import li.cil.tis3d.util.Color;
 

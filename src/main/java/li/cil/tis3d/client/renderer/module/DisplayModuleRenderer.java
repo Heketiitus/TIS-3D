@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import li.cil.tis3d.api.API;
 import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotationRenderer;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.ModRenderType;
 import li.cil.tis3d.common.module.DisplayModule;
@@ -24,9 +25,18 @@ public class DisplayModuleRenderer extends AbstractModuleWithRotationRenderer<Di
     // technically, but that'd usually look pretty weird. Also it's more
     // intuitive that the usable area start in the inner, black part.
     private static final int MARGIN = 4;
-
-    private static int nextTextureId = 0;
     private static final Map<DisplayModule, RenderData> RENDER_DATA = new HashMap<>();
+    private static int nextTextureId = 0;
+
+    /**
+     * Deletes our texture from the GPU, if we have one.
+     */
+    public static void deleteTexture(DisplayModule module) {
+        final RenderData data = RENDER_DATA.get(module);
+        if (data != null) {
+            data.delete();
+        }
+    }
 
     private RenderData getRenderData(DisplayModule module) {
         return RENDER_DATA.computeIfAbsent(module, m -> {
@@ -61,16 +71,6 @@ public class DisplayModuleRenderer extends AbstractModuleWithRotationRenderer<Di
         context.drawQuad(builder, MARGIN / 32f, MARGIN / 32f, DisplayModule.RESOLUTION / 32f, DisplayModule.RESOLUTION / 32f);
 
         matrixStack.popPose();
-    }
-
-    /**
-     * Deletes our texture from the GPU, if we have one.
-     */
-    public static void deleteTexture(DisplayModule module) {
-        final RenderData data = RENDER_DATA.get(module);
-        if (data != null) {
-            data.delete();
-        }
     }
 
     private record RenderData(DynamicTexture texture, ResourceLocation textureId, RenderType renderType) {

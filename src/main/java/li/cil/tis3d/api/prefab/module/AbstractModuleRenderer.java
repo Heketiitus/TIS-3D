@@ -1,9 +1,8 @@
-package li.cil.tis3d.client.renderer.module;
+package li.cil.tis3d.api.prefab.module;
 
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.module.Module;
 import li.cil.tis3d.api.module.ModuleRenderer;
-import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;

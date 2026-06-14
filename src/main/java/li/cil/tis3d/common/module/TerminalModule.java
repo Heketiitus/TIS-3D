@@ -36,6 +36,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
+import java.util.List;
 
 public final class TerminalModule extends AbstractModuleWithRotation {
     // Persisted data
@@ -80,9 +81,9 @@ public final class TerminalModule extends AbstractModuleWithRotation {
     private static final byte PACKET_CLEAR = 2;
 
     // Rendering/state constants.
-    private static final int MAX_ROWS = 21;
-    private static final int MAX_COLUMNS = 40;
-    private static final int TAB_WIDTH = 2;
+    public static final int MAX_ROWS = 21;
+    public static final int MAX_COLUMNS = 40;
+    public static final int TAB_WIDTH = 2;
 
     // For string<->byte[] conversion when sending input to server.
     private static final Charset UTF_8 = StandardCharsets.UTF_8;
@@ -108,6 +109,18 @@ public final class TerminalModule extends AbstractModuleWithRotation {
 
     public TerminalModule(final Casing casing, final Face face) {
         super(casing, face);
+    }
+
+    public List<StringBuilder> getDisplay() {
+        return display;
+    }
+
+    public StringBuilder getInput() {
+        return input;
+    }
+
+    public boolean isInputEnabled() {
+        return isInputEnabled;
     }
 
     // --------------------------------------------------------------------- //
@@ -281,55 +294,6 @@ public final class TerminalModule extends AbstractModuleWithRotation {
 
     // --------------------------------------------------------------------- //
     // Rendering
-
-    @OnlyIn(Dist.CLIENT)
-    private void renderText(final RenderContext context) {
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.translate(2f / 16f, 2f / 16f, 0);
-        matrixStack.scale(1 / 512f, 1 / 512f, 1);
-
-        final var fontRenderer = API.normalFontRenderer;
-
-        final int totalWidth = 12 * 32;
-        final int textWidth = MAX_COLUMNS * fontRenderer.width(" ");
-        final float offsetX = (totalWidth - textWidth) / 2f;
-        matrixStack.translate(offsetX, 10f, 0);
-
-        renderDisplay(context, fontRenderer);
-
-        matrixStack.translate(0, (MAX_ROWS - display.size()) * fontRenderer.lineHeight() + 4, 0);
-
-        renderInput(context, fontRenderer, textWidth);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private void renderDisplay(final RenderContext context, final FontRenderer fontRenderer) {
-        final PoseStack matrixStack = context.getMatrixStack();
-        for (final StringBuilder line : display) {
-            context.drawString(fontRenderer, line, Color.WHITE);
-            matrixStack.translate(0, fontRenderer.lineHeight(), 0);
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private void renderInput(final RenderContext context, final FontRenderer fontRenderer, final int textWidth) {
-        final PoseStack matrixStack = context.getMatrixStack();
-
-        final int color = Color.withAlpha(Color.WHITE, isInputEnabled ? 1f : 0.5f);
-
-        context.drawQuadUnlit(-4, 0, textWidth + 8, 24, color);
-        context.drawQuadUnlit(-2, 2, textWidth + 4, 20, Color.DARK_GRAY);
-
-        matrixStack.translate(0, 4, 0);
-        context.drawString(fontRenderer, input, Color.WHITE);
-
-        if (isInputEnabled && input.length() < MAX_COLUMNS && System.currentTimeMillis() % 800 > 400) {
-            final int w = fontRenderer.width(" ");
-            final int h = fontRenderer.lineHeight();
-            final int x = input.length() * w;
-            context.drawQuadUnlit(x, 0, w, h, Color.WHITE);
-        }
-    }
 
     @OnlyIn(Dist.CLIENT)
     private void openScreen() {

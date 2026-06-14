@@ -1,22 +1,14 @@
 package li.cil.tis3d.common.module;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import li.cil.manual.api.render.FontRenderer;
-import li.cil.tis3d.api.API;
 import li.cil.tis3d.api.machine.Casing;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Pipe;
 import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
-import li.cil.tis3d.api.util.RenderContext;
-import li.cil.tis3d.client.renderer.Textures;
-import li.cil.tis3d.util.Color;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * The queue module can be used to store a number of values to be retrieved
@@ -48,13 +40,26 @@ public final class QueueModule extends AbstractModuleWithRotation {
      * The number of elements the queue may store, plus one never used slot
      * to allow easily differentiating empty and full queue states.
      */
-    private static final int QUEUE_SIZE = 17;
+    public static final int QUEUE_SIZE = 17;
 
     // --------------------------------------------------------------------- //
 
     public QueueModule(final Casing casing, final Face face) {
         super(casing, face);
     }
+
+    public short getAt(final int index) {
+        return queue[index];
+    }
+
+    public int getHead() {
+        return head;
+    }
+
+    public int getTail() {
+        return tail;
+    }
+
 
     // --------------------------------------------------------------------- //
     // Module
@@ -137,7 +142,7 @@ public final class QueueModule extends AbstractModuleWithRotation {
      *
      * @return <tt>true</tt> if the queue is empty, <tt>false</tt> otherwise.
      */
-    private boolean isEmpty() {
+    public boolean isEmpty() {
         return head == tail;
     }
 
@@ -240,24 +245,5 @@ public final class QueueModule extends AbstractModuleWithRotation {
             data.writeShort(value);
         }
         getCasing().sendData(getFace(), data, DATA_TYPE_UPDATE);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private void drawState(final RenderContext context) {
-        final PoseStack matrixStack = context.getMatrixStack();
-
-        // Offset to start drawing at top left of inner area, slightly inset.
-        matrixStack.translate(3 / 16f, 5 / 16f, 0);
-        matrixStack.scale(1 / 128f, 1 / 128f, 1);
-        matrixStack.translate(4.5f, 14.5f, 0);
-
-        final FontRenderer fontRenderer = API.smallFontRenderer;
-        for (int i = tail, j = 0; i != head; i = (i + 1) % QUEUE_SIZE, j++) {
-            context.drawString(fontRenderer, String.format("%4X", queue[i]), Color.WHITE);
-            matrixStack.translate(0, fontRenderer.lineHeight() + 1, 0);
-            if ((j + 1) % 4 == 0) {
-                matrixStack.translate((fontRenderer.width(" ") + 1) * 5, (fontRenderer.lineHeight() + 1) * -4, 0);
-            }
-        }
     }
 }

@@ -107,6 +107,18 @@ public final class TimerModule extends AbstractModuleWithRotation {
 
     // --------------------------------------------------------------------- //
 
+    public boolean hasElapsed() {
+        return hasElapsed;
+    }
+
+    public long getTimer() {
+        return timer;
+    }
+
+    public void elapsed() {
+        hasElapsed = true;
+    }
+
     /**
      * Set the timer to the specified value.
      *
@@ -164,31 +176,5 @@ public final class TimerModule extends AbstractModuleWithRotation {
         final ByteBuf data = Unpooled.buffer();
         data.writeLong(timer);
         getCasing().sendData(getFace(), data, DATA_TYPE_UPDATE);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private void drawState(final RenderContext context, final float remaining) {
-        final float milliseconds = remaining * 50f; // One tick is 50ms.
-        final float seconds = milliseconds / 1000f;
-        final int minutes = (int) (seconds / 60f);
-
-        final String time;
-        if (minutes > 0) {
-            time = String.format("%d:%02d", minutes, (int) seconds % 60);
-        } else {
-            time = String.format("%.2f", seconds);
-        }
-
-        final FontRenderer fontRenderer = API.normalFontRenderer;
-
-        final int width = fontRenderer.width(time);
-        final int height = fontRenderer.lineHeight();
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.translate(0.5f, 0.5f, 0);
-        matrixStack.scale(1 / 80f, 1 / 80f, 1);
-        matrixStack.translate(-width / 2f + 1, -height / 2f + 1, 0);
-
-        context.drawString(fontRenderer, time, Color.WHITE);
     }
 }

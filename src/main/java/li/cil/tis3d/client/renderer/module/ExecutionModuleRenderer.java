@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.manual.api.render.FontRenderer;
 import li.cil.tis3d.api.API;
 import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotationRenderer;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.Textures;
 import li.cil.tis3d.common.module.ExecutionModule;
@@ -12,21 +13,10 @@ import li.cil.tis3d.common.module.execution.MachineState;
 import li.cil.tis3d.common.module.execution.compiler.ParseException;
 import li.cil.tis3d.util.Color;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.Optional;
 
 public class ExecutionModuleRenderer extends AbstractModuleWithRotationRenderer<ExecutionModule> {
-    @OnlyIn(Dist.CLIENT)
-    private static final class RenderData {
-        private static final ResourceLocation[] STATE_LOCATIONS = new ResourceLocation[]{
-            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_IDLE,
-            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_ERROR,
-            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_RUNNING,
-            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_WAITING
-        };
-    }
 
     @Override
     public boolean matches(Module module) {
@@ -55,8 +45,6 @@ public class ExecutionModuleRenderer extends AbstractModuleWithRotationRenderer<
         matrixStack.popPose();
     }
 
-
-    @OnlyIn(Dist.CLIENT)
     private void renderState(final ExecutionModule module, final RenderContext context, final MachineState machineState) {
         final ExecutionState executionState = module.getExecutionState();
         final ParseException compileError = module.getCompileError();
@@ -127,8 +115,16 @@ public class ExecutionModuleRenderer extends AbstractModuleWithRotationRenderer<
      *
      * @param height the height of the line to draw.
      */
-    @OnlyIn(Dist.CLIENT)
-    private static void drawLine(final RenderContext context, final int height, final int color) {
+    private void drawLine(final RenderContext context, final int height, final int color) {
         context.drawQuadUnlit(-0.5f, -0.5f, 72, height + 1, color);
+    }
+
+    private static final class RenderData {
+        private static final ResourceLocation[] STATE_LOCATIONS = new ResourceLocation[]{
+            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_IDLE,
+            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_ERROR,
+            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_RUNNING,
+            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_WAITING
+        };
     }
 }
