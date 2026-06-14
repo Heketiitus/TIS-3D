@@ -137,7 +137,7 @@ dependencies {
 
 
     // Sable
-    jarJar(api(libs.sableCompanion))
+    jarJar(api(libs.sableCompanion.get()))
 
     // Example mod dependency using a file as dependency
     // implementation files("libs/coolmod-${mc_version}-${coolmod_version}.jar")
