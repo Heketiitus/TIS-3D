@@ -1,6 +1,7 @@
 package li.cil.tis3d.client.renderer.block.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.ryanhcode.sable.companion.SableCompanion;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.module.Module;
@@ -30,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Quaternionf;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
@@ -95,10 +97,19 @@ public final class CasingBlockEntityRenderer implements BlockEntityRenderer<Casi
     }
 
     private boolean isBackFace(final BlockPos position, final Face face) {
+
         final Vec3 cameraPosition = renderer.camera.getPosition();
-        final Vec3 blockCenter = Vec3.atCenterOf(position);
+        final Vector3d blockCenter = SableCompanion.INSTANCE.projectOutOfSubLevel(
+            renderer.level,
+            new Vector3d(
+                position.getX() + 0.5,
+                position.getY() + 0.5,
+                position.getZ() + 0.5
+            )
+        );
+
         final Vec3 faceNormal = Vec3.atLowerCornerOf(Face.toDirection(face).getNormal());
-        final Vec3 faceCenter = blockCenter.add(faceNormal.scale(0.5));
+        final Vec3 faceCenter = faceNormal.scale(0.5).add(blockCenter.x, blockCenter.y, blockCenter.z);
         final Vec3 cameraToFaceCenter = faceCenter.subtract(cameraPosition);
         return faceNormal.dot(cameraToFaceCenter) > 0;
     }

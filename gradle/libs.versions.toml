@@ -10,3 +10,4 @@ moddev = { id = "net.neoforged.moddev", version.ref = "moddev" }
 
 [libraries]
 manual = { group = "maven.modrinth", name = "markdown-manual-renewed", version.ref = "manual" }
+sableCompanion = { group = "dev.ryanhcode.sable-companion", name = "sable-companion-common-1.21.1", version = "1.6.0" }

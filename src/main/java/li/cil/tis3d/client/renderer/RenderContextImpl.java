@@ -2,6 +2,7 @@ package li.cil.tis3d.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import dev.ryanhcode.sable.companion.SableCompanion;
 import li.cil.manual.api.render.FontRenderer;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.util.Color;
@@ -66,7 +67,15 @@ public final class RenderContextImpl implements RenderContext {
 
     @Override
     public boolean closeEnoughForDetails(final BlockPos position) {
-        return position.closerToCenterThan(dispatcher.camera.getPosition(), (float) DETAIL_RENDER_RANGE);
+        return SableCompanion.INSTANCE.distanceSquaredWithSubLevels(
+            dispatcher.level,
+            dispatcher.camera.getPosition().x,
+            dispatcher.camera.getPosition().y,
+            dispatcher.camera.getPosition().z,
+            position.getX() + 0.5,
+            position.getY() + 0.5,
+            position.getZ() + 0.5
+        ) < DETAIL_RENDER_RANGE * DETAIL_RENDER_RANGE;
     }
 
     @Override

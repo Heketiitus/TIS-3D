@@ -30,6 +30,8 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+
+    maven { url = "https://maven.ryanhcode.dev/releases" } // Sable
 }
 
 base {
@@ -132,6 +134,11 @@ dependencies {
     // The group id is ignored when searching -- in this case, it is "blank"
     // implementation "blank:coolmod-${mc_version}:${coolmod_version}"
     implementation libs.manual
+
+
+    // Sable
+    jarJar(api(libs.sableCompanion))
+
     // Example mod dependency using a file as dependency
     // implementation files("libs/coolmod-${mc_version}-${coolmod_version}.jar")
 
