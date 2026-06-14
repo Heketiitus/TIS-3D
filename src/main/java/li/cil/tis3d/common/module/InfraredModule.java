@@ -88,16 +88,6 @@ public final class InfraredModule extends AbstractModule implements InfraredRece
         stepOutput();
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled()) {
-            return;
-        }
-
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_INFRARED);
-    }
-
     @Override
     public void load(final CompoundTag tag) {
         super.load(tag);

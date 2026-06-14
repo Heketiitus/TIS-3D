@@ -54,9 +54,8 @@ public final class ReadOnlyMemoryModule extends RandomAccessMemoryModule {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
-    protected int getCellColor() {
+    public int getCellColor() {
         return 0xFFCCFFCC;
     }
 }

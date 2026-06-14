@@ -4,13 +4,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.module.ModuleRenderer;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.api.util.TransformUtil;
+import li.cil.tis3d.client.renderer.ModuleRenderers;
 import li.cil.tis3d.client.renderer.RenderContextImpl;
 import li.cil.tis3d.client.renderer.Textures;
 import li.cil.tis3d.common.block.entity.CasingBlockEntity;
 import li.cil.tis3d.common.item.Items;
 import li.cil.tis3d.common.network.Network;
+import li.cil.tis3d.util.RegistryUtils;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
@@ -29,7 +32,9 @@ import org.apache.logging.log4j.Logger;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -47,7 +52,7 @@ public final class CasingBlockEntityRenderer implements BlockEntityRenderer<Casi
     private static final Vector3f AXIS_Y_POSITIVE = new Vector3f(0, 1, 0);
     private static final Vector3f AXIS_Z_POSITIVE = new Vector3f(0, 0, 1);
     private final static Set<Class<?>> BLACKLIST = new HashSet<>();
-
+    private final static Map<Module, ModuleRenderer<?>> RENDERERS = new HashMap<>();
     private final BlockEntityRenderDispatcher renderer;
 
     public CasingBlockEntityRenderer(final BlockEntityRendererProvider.Context context) {
@@ -223,7 +228,7 @@ public final class CasingBlockEntityRenderer implements BlockEntityRenderer<Casi
         }
 
         try {
-            module.render(context);
+            findRenderer(module).render(module, context);
         } catch (final Exception e) {
             BLACKLIST.add(module.getClass());
             LOGGER.error("A module threw an exception while rendering, won't render again!", e);
@@ -262,5 +267,13 @@ public final class CasingBlockEntityRenderer implements BlockEntityRenderer<Casi
         }
 
         return Objects.equals(blockHit.getBlockPos(), pos);
+    }
+
+    private ModuleRenderer<Module> findRenderer(final Module module) {
+        return (ModuleRenderer<Module>) RENDERERS.computeIfAbsent(module, m ->
+            RegistryUtils.get(ModuleRenderer.REGISTRY).stream()
+                .filter(r -> r.matches(m))
+                .findAny()
+                .orElseThrow());
     }
 }

@@ -1,31 +1,25 @@
 package li.cil.tis3d.common.module;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import li.cil.manual.api.render.FontRenderer;
-import li.cil.tis3d.api.API;
 import li.cil.tis3d.api.machine.Casing;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.module.traits.ModuleWithBlockChangeListener;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
-import li.cil.tis3d.api.util.RenderContext;
-import li.cil.tis3d.client.renderer.Textures;
 import li.cil.tis3d.common.config.Constants;
 import li.cil.tis3d.common.item.CodeBookItem;
 import li.cil.tis3d.common.item.Items;
+import li.cil.tis3d.common.module.execution.ExecutionState;
 import li.cil.tis3d.common.module.execution.MachineImpl;
 import li.cil.tis3d.common.module.execution.MachineState;
 import li.cil.tis3d.common.module.execution.compiler.Compiler;
 import li.cil.tis3d.common.module.execution.compiler.ParseException;
 import li.cil.tis3d.common.module.execution.compiler.Strings;
-import li.cil.tis3d.util.Color;
 import li.cil.tis3d.util.EnumUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -33,8 +27,6 @@ import net.minecraft.world.item.component.WritableBookContent;
 import net.minecraft.world.item.component.WrittenBookContent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -51,27 +43,10 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
 
     private final MachineImpl machine;
     private ParseException compileError;
-    private State state = State.IDLE;
+    private ExecutionState executionState = ExecutionState.IDLE;
 
     // --------------------------------------------------------------------- //
     // Computed data
-
-    private enum State {
-        IDLE,
-        ERR,
-        RUN,
-        WAIT
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static final class RenderData {
-        private static final ResourceLocation[] STATE_LOCATIONS = new ResourceLocation[]{
-            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_IDLE,
-            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_ERROR,
-            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_RUNNING,
-            Textures.LOCATION_OVERLAY_MODULE_EXECUTION_WAITING
-        };
-    }
 
     // NBT tag names.
     private static final String TAG_STATE = "state";
@@ -91,28 +66,35 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
     public MachineState getState() {
         return machine.getState();
     }
+    public ExecutionState getExecutionState() {
+        return executionState;
+    }
+
+    public @Nullable ParseException getCompileError() {
+        return compileError;
+    }
 
     // --------------------------------------------------------------------- //
     // Module
 
     @Override
     public void step() {
-        final State prevState = state;
+        final ExecutionState prevExecutionState = executionState;
 
         if (compileError != null) {
-            state = State.ERR;
+            executionState = ExecutionState.ERR;
         } else if (getState().instructions.isEmpty()) {
-            state = State.IDLE;
+            executionState = ExecutionState.IDLE;
         } else if (machine.step()) {
-            state = State.RUN;
+            executionState = ExecutionState.RUN;
             getCasing().setChanged();
             sendPartialState();
             return; // Don't send data twice.
         } else {
-            state = State.WAIT;
+            executionState = ExecutionState.WAIT;
         }
 
-        if (prevState != state) {
+        if (prevExecutionState != executionState) {
             getCasing().setChanged();
             sendPartialState();
         }
@@ -126,7 +108,7 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
     @Override
     public void onDisabled() {
         getState().reset();
-        state = State.IDLE;
+        executionState = ExecutionState.IDLE;
 
         sendPartialState();
     }
@@ -230,30 +212,7 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
         } else {
             machineState.last = Optional.empty();
         }
-        state = State.values()[data.readByte()];
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if ((!getCasing().isEnabled() || !isVisible()) && !this.isHitFace(context.getDispatcher().cameraHitResult)) {
-            return;
-        }
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        // Draw status texture.
-        context.drawAtlasQuadUnlit(RenderData.STATE_LOCATIONS[state.ordinal()]);
-
-        // Render detailed state when player is close.
-        final MachineState machineState = getState();
-        if (machineState.code != null && context.closeEnoughForDetails(getCasing().getPosition())) {
-            renderState(context, machineState);
-        }
-
-        matrixStack.popPose();
+        executionState = ExecutionState.values()[data.readByte()];
     }
 
     @Override
@@ -262,7 +221,7 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
 
         final CompoundTag machineTag = tag.getCompound(TAG_MACHINE);
         getState().load(machineTag);
-        state = EnumUtils.load(State.class, TAG_STATE, tag);
+        executionState = EnumUtils.load(ExecutionState.class, TAG_STATE, tag);
 
         if (getState().code != null) {
             compile(Arrays.asList(getState().code));
@@ -276,7 +235,7 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
         final CompoundTag machineTag = new CompoundTag();
         getState().save(machineTag);
         tag.put(TAG_MACHINE, machineTag);
-        EnumUtils.save(state, TAG_STATE, tag);
+        EnumUtils.save(executionState, TAG_STATE, tag);
     }
 
     // --------------------------------------------------------------------- //
@@ -332,83 +291,9 @@ public final class ExecutionModule extends AbstractModuleWithRotation implements
         data.writeShort(getState().bak);
         data.writeBoolean(getState().last.isPresent());
         getState().last.ifPresent(port -> data.writeByte((byte) port.ordinal()));
-        data.writeByte(state.ordinal());
+        data.writeByte(executionState.ordinal());
 
         getCasing().sendData(getFace(), data, DATA_TYPE_INCREMENTAL);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private void renderState(final RenderContext context, final MachineState machineState) {
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-
-        // Offset to start drawing at top left of inner area, slightly inset.
-        matrixStack.translate(3.5f / 16f, 3.5f / 16f, 0);
-        matrixStack.scale(1 / 128f, 1 / 128f, 1);
-        matrixStack.translate(1, 1, 0);
-
-        final FontRenderer fontRenderer = API.smallFontRenderer;
-
-        // Draw register info on top.
-        final String accLast = String.format("ACC:%4X LAST:%s", machineState.acc, machineState.last.map(Enum::name).orElse("NONE"));
-        context.drawString(fontRenderer, accLast, Color.WHITE);
-        matrixStack.translate(0, fontRenderer.lineHeight() + 4, 0);
-
-        final String bakState = String.format("BAK:%4X MODE:%s", machineState.bak, state.name());
-        context.drawString(fontRenderer, bakState, Color.WHITE);
-        matrixStack.translate(0, fontRenderer.lineHeight() + 4, 0);
-
-        drawLine(context, 1, Color.WHITE);
-
-        matrixStack.translate(0, 5, 0);
-
-        // If we have more lines than fit on our "screen", offset so that the
-        // current line is in the middle, but don't let last line scroll in.
-        final int maxLines = 50 / (fontRenderer.lineHeight() + 1);
-        final int totalLines = machineState.code.length;
-        final int currentLine;
-        if (!machineState.lineNumbers.isEmpty()) {
-            currentLine = Optional.ofNullable(machineState.lineNumbers.get(machineState.pc)).orElse(-1);
-        } else if (compileError != null) {
-            currentLine = compileError.getLineNumber();
-        } else {
-            currentLine = -1;
-        }
-        final int page = currentLine / maxLines;
-        final int offset = page * maxLines;
-
-        for (int lineNumber = offset; lineNumber < Math.min(totalLines, offset + maxLines); lineNumber++) {
-            final String line = machineState.code[lineNumber];
-            final CharSequence charSequence = line.subSequence(0, Math.min(line.length(), 18));
-            if (lineNumber == currentLine) {
-                // Draw current line marker behind text
-                if (state == State.WAIT) {
-                    drawLine(context, fontRenderer.lineHeight(), Color.LIGHT_GRAY);
-                } else if (state == State.ERR || compileError != null && compileError.getLineNumber() == currentLine) {
-                    drawLine(context, fontRenderer.lineHeight(), Color.RED);
-                } else {
-                    drawLine(context, fontRenderer.lineHeight(), Color.WHITE);
-                }
-
-                context.drawString(fontRenderer, charSequence, Color.BLACK);
-            } else {
-                context.drawString(fontRenderer, charSequence, Color.WHITE);
-            }
-
-            matrixStack.translate(0, fontRenderer.lineHeight() + 1, 0);
-        }
-
-        matrixStack.popPose();
-    }
-
-    /**
-     * Draws a horizontal line of the specified height.
-     *
-     * @param height the height of the line to draw.
-     */
-    @OnlyIn(Dist.CLIENT)
-    private static void drawLine(final RenderContext context, final int height, final int color) {
-        context.drawQuadUnlit(-0.5f, -0.5f, 72, height + 1, color);
     }
 
     // --------------------------------------------------------------------- //

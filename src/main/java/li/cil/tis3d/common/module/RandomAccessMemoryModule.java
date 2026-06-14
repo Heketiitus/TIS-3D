@@ -65,18 +65,14 @@ public class RandomAccessMemoryModule extends AbstractModuleWithRotation {
     private static final byte PACKET_SINGLE = 1;
     private static final byte PACKET_FULL = 2;
 
-    // Rendering info.
-    private static final float QUADS_U0 = 5 / 32f;
-    private static final float QUADS_V0 = 5 / 32f;
-    private static final float QUADS_SIZE_U = 4 / 32f;
-    private static final float QUADS_SIZE_V = 4 / 32f;
-    private static final float QUADS_STEP_U = 6 / 32f;
-    private static final float QUADS_STEP_V = 6 / 32f;
-
     // --------------------------------------------------------------------- //
 
     public RandomAccessMemoryModule(final Casing casing, final Face face) {
         super(casing, face);
+    }
+
+    public byte[] getMemory() {
+        return memory;
     }
 
     // --------------------------------------------------------------------- //
@@ -158,35 +154,6 @@ public class RandomAccessMemoryModule extends AbstractModuleWithRotation {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled() || !isVisible()) {
-            return;
-        }
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        final int cells = 4;
-        final int cellSize = MEMORY_SIZE / (cells * cells);
-        final int cellWidth = (int) Math.sqrt(cellSize);
-        final int cellColor = getCellColor();
-        for (int y = 0; y < cells; y++) {
-            for (int x = 0; x < cells; x++) {
-                final float brightness = 0.25f + sectorSum(x * cellWidth, y * cellWidth, cellWidth) * 0.75f;
-                final int color = Color.withAlpha(cellColor, brightness);
-
-                final float u0 = QUADS_U0 + x * QUADS_STEP_U;
-                final float v0 = QUADS_V0 + y * QUADS_STEP_V;
-                context.drawQuadUnlit(u0, v0, QUADS_SIZE_U, QUADS_SIZE_V, color);
-            }
-        }
-
-        matrixStack.popPose();
-    }
-
     @Override
     public void load(final CompoundTag tag) {
         super.load(tag);
@@ -224,8 +191,7 @@ public class RandomAccessMemoryModule extends AbstractModuleWithRotation {
     /**
      * Get the color of the memory cells for this module.
      */
-    @OnlyIn(Dist.CLIENT)
-    protected int getCellColor() {
+    public int getCellColor() {
         return 0xFFBBDDFF;
     }
 
@@ -342,19 +308,6 @@ public class RandomAccessMemoryModule extends AbstractModuleWithRotation {
         data.writeByte(PACKET_FULL);
         data.writeBytes(memory);
         getCasing().sendData(getFace(), data);
-    }
-
-    private float sectorSum(final int x0, final int y0, final int sectorWidth) {
-        int sum = 0;
-        final int sectorSize = sectorWidth * sectorWidth;
-        final int rowWidth = MEMORY_SIZE / sectorSize;
-        for (int y = y0; y < y0 + sectorWidth; y++) {
-            for (int x = x0; x < x0 + sectorWidth; x++) {
-                final int i = y * rowWidth + x;
-                sum += memory[i] & 0xFF;
-            }
-        }
-        return sum / (sectorWidth * sectorWidth * (float) 0xFF);
     }
 
     protected final void load(final byte[] data) {

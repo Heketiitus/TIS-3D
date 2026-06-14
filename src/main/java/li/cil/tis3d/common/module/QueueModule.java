@@ -102,27 +102,6 @@ public final class QueueModule extends AbstractModuleWithRotation {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled()) {
-            return;
-        }
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_QUEUE);
-
-        // Render detailed state when player is close.
-        if (!isEmpty() && context.closeEnoughForDetails(getCasing().getPosition())) {
-            drawState(context);
-        }
-
-        matrixStack.popPose();
-    }
-
     @Override
     public void load(final CompoundTag tag) {
         super.load(tag);

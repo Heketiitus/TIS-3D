@@ -13,6 +13,7 @@ import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.prefab.module.AbstractModuleWithRotation;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.client.renderer.ModRenderType;
+import li.cil.tis3d.client.renderer.module.DisplayModuleRenderer;
 import li.cil.tis3d.util.Color;
 import li.cil.tis3d.util.EnumUtils;
 import net.minecraft.client.Minecraft;
@@ -73,12 +74,7 @@ public final class DisplayModule extends AbstractModuleWithRotation {
     }
 
     // Resolution of the screen in pixels, width = height.
-    private static final int RESOLUTION = 24;
-
-    // Don't allow displaying stuff on the edge of the casing. I mean we could,
-    // technically, but that'd usually look pretty weird. Also it's more
-    // intuitive that the usable area start in the inner, black part.
-    private static final int MARGIN = 4;
+    public static final int RESOLUTION = 24;
 
     // NBT tag names.
     private static final String TAG_IMAGE = "image";
@@ -88,26 +84,20 @@ public final class DisplayModule extends AbstractModuleWithRotation {
     // Data packet types.
     private static final byte DATA_TYPE_CLEAR = 0;
 
-    // Running counter for unique dynamic texture ids.
-    @OnlyIn(Dist.CLIENT)
-    private static int nextTextureId;
-
-    // Backing texture used to render the module data.
-    @OnlyIn(Dist.CLIENT)
-    private DynamicTexture texture;
-
-    // Id of the backing texture, required by MC dynamic texture system.
-    @OnlyIn(Dist.CLIENT)
-    private ResourceLocation textureId;
-
-    // Render layer we render our texture in.
-    @OnlyIn(Dist.CLIENT)
-    private RenderType renderLayer;
-
     // --------------------------------------------------------------------- //
 
     public DisplayModule(final Casing casing, final Face face) {
         super(casing, face);
+    }
+
+    public boolean resetImageDirty() {
+        boolean result = imageDirty;
+        imageDirty = false;
+        return result;
+    }
+
+    public int[] getImage() {
+        return image;
     }
 
     // --------------------------------------------------------------------- //
@@ -133,7 +123,7 @@ public final class DisplayModule extends AbstractModuleWithRotation {
     public void onDisposed() {
         super.onDisposed();
         if (getCasing().getCasingLevel().isClientSide()) {
-            deleteTexture();
+            DisplayModuleRenderer.deleteTexture(this);
         }
     }
 
@@ -147,25 +137,6 @@ public final class DisplayModule extends AbstractModuleWithRotation {
         }
 
         imageDirty = true;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled()) {
-            return;
-        }
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        validateTexture();
-
-        final VertexConsumer builder = context.getBuffer().getBuffer(getOrCreateRenderLayer());
-        context.drawQuad(builder, MARGIN / 32f, MARGIN / 32f, RESOLUTION / 32f, RESOLUTION / 32f);
-
-        matrixStack.popPose();
     }
 
     @Override
@@ -248,84 +219,6 @@ public final class DisplayModule extends AbstractModuleWithRotation {
                 image[index] = argb;
             }
         }
-    }
-
-    /**
-     * Gets the texture used for uploading module data to the GPU, creates one if necessary.
-     *
-     * @return the texture used to upload data to the GPU.
-     */
-    @OnlyIn(Dist.CLIENT)
-    private DynamicTexture getOrCreateTexture() {
-        if (texture == null) {
-            texture = new DynamicTexture(RESOLUTION, RESOLUTION, false);
-        }
-
-        return texture;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private RenderType getOrCreateRenderLayer() {
-        if (renderLayer == null) {
-            final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-            final DynamicTexture texture = getOrCreateTexture();
-            textureId = API.resource("dynamic/display_module_" + (++nextTextureId));
-            textureManager.register(textureId, texture);
-            renderLayer = ModRenderType.unlitTexture(textureId);
-        }
-
-        return renderLayer;
-    }
-
-    /**
-     * Deletes our texture from the GPU, if we have one.
-     */
-    @OnlyIn(Dist.CLIENT)
-    private void deleteTexture() {
-        if (textureId != null) {
-            Minecraft.getInstance().doRunTask(() -> {
-                Minecraft.getInstance().getTextureManager().release(textureId);
-            });
-        }
-
-        if (texture != null) {
-            Minecraft.getInstance().doRunTask(() -> {
-                texture.close();
-                texture = null;
-            });
-        }
-    }
-
-    /**
-     * Uploads new image data if it changed, creates texture if necessary.
-     */
-    @OnlyIn(Dist.CLIENT)
-    private void validateTexture() {
-        if (!imageDirty) {
-            return;
-        }
-
-        imageDirty = false;
-
-        final DynamicTexture texture = getOrCreateTexture();
-        final NativeImage nativeImage = texture.getPixels();
-        if (nativeImage == null) {
-            return;
-        }
-
-        int ip = 0;
-        for (int iy = 0; iy < RESOLUTION; iy++) {
-            for (int ix = 0; ix < RESOLUTION; ix++, ip++) {
-                final int argb = image[ip];
-                final int a = ARGB32.alpha(argb);
-                final int b = ARGB32.blue(argb);
-                final int g = ARGB32.green(argb);
-                final int r = ARGB32.red(argb);
-                nativeImage.setPixelRGBA(ix, iy, ABGR32.color(a, b, g, r));
-            }
-        }
-
-        texture.upload();
     }
 
     /**

@@ -35,14 +35,6 @@ public final class RedstoneModule extends AbstractModuleWithRotation implements 
     // Data packet types.
     private static final byte DATA_TYPE_UPDATE = 0;
 
-    // Rendering info.
-    private static final float OUTPUT_X = 9 / 32f;
-    private static final float INPUT_X = 20 / 32f;
-    private static final float SHARED_V0 = 10 / 32f;
-    private static final float SHARED_Y = 25 / 32f;
-    private static final float SHARED_W = 3 / 32f;
-    private static final float SHARED_H = SHARED_Y - SHARED_V0;
-
     /**
      * The last tick we updated. Used to avoid changing output multiple times a
      * tick, which is usually pointless and really bad for performance.
@@ -105,42 +97,6 @@ public final class RedstoneModule extends AbstractModuleWithRotation implements 
     public void onData(final ByteBuf data) {
         input = data.readShort();
         output = data.readShort();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        // Draw base overlay.
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE);
-
-        if (!getCasing().isEnabled()) {
-            matrixStack.popPose();
-            return;
-        }
-
-        // Draw output bar.
-        final float relativeOutput = output / 15f;
-        final float heightOutput = relativeOutput * SHARED_H;
-        final float v0Output = SHARED_Y - heightOutput;
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE_BARS,
-            OUTPUT_X, v0Output, SHARED_W, heightOutput,
-            OUTPUT_X, v0Output, OUTPUT_X + SHARED_W, v0Output + heightOutput,
-            Color.WHITE);
-
-        // Draw input bar.
-        final float relativeInput = input / 15f;
-        final float heightInput = relativeInput * SHARED_H;
-        final float v0Input = SHARED_Y - heightInput;
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE_BARS,
-            INPUT_X, v0Input, SHARED_W, heightInput,
-            INPUT_X, v0Input, INPUT_X + SHARED_W, v0Input + heightInput,
-            Color.WHITE);
-
-        matrixStack.popPose();
     }
 
     @Override

@@ -40,26 +40,10 @@ public abstract class AbstractModuleWithRotation extends AbstractModule implemen
     }
 
     // --------------------------------------------------------------------- //
-    // Rendering utility
-
-    /**
-     * Apply the module's rotation to the OpenGL state.
-     *
-     * @param matrixStack the current matrix stack.
-     */
-    @ClientSided
-    protected void rotateForRendering(final PoseStack matrixStack) {
-        final int rotation = Port.ROTATION[getFacing().ordinal()];
-        matrixStack.translate(0.5f, 0.5f, 0);
-        matrixStack.mulPose(new Quaternionf().fromAxisAngleDeg(0, 0, 1, 90 * rotation * Face.toDirection(getFace()).getStepY()));
-        matrixStack.translate(-0.5f, -0.5f, 0);
-    }
-
-    // --------------------------------------------------------------------- //
     // General utility
 
     @Override
-    protected Vec3 hitToUV(final Vec3 hitPos) {
+    public Vec3 hitToUV(final Vec3 hitPos) {
         return TransformUtil.hitToUV(getFace(), getFacing(), hitPos);
     }
 

@@ -20,35 +20,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 public final class SequencerModule extends AbstractModuleWithRotation {
-    // --------------------------------------------------------------------- //
-    // Persisted data
-
-    private final boolean[][] configuration = new boolean[COL_COUNT][ROW_COUNT];
-    private int position = -1;
-    private int delay = 4;
-    private int stepsRemaining = 0;
-
-    // --------------------------------------------------------------------- //
-    // Computed data
-
-    // NBT data names.
-    private static final String TAG_CONFIGURATION = "configuration";
-    private static final String TAG_POSITION = "position";
-    private static final String TAG_DELAY = "delay";
-    private static final String TAG_STEPS_REMAINING = "stepsRemaining";
-
-    // Colors for module rendering.
-    private static final int BAR_COLOR = 0xFF334C59;
-    private static final int ACTIVE_CELL_COLOR = 0xFFCCD8DF;
-    private static final int HIGHLIGHT_COLOR = 0x80B2CCE5;
-
-    // Data packet types.
-    private static final byte DATA_TYPE_CONFIGURATION = 0;
-    private static final byte DATA_TYPE_POSITION = 1;
-
-    private static final int COL_COUNT = 8;
-    private static final int ROW_COUNT = 8;
-
     // Rendering info.
     private static final float CELLS_U0 = 5 / 32f;
     private static final float CELLS_V0 = 5 / 32f;
@@ -67,6 +38,30 @@ public final class SequencerModule extends AbstractModuleWithRotation {
     private static final float BAR_SIZE_U = 6 / 64f;
     private static final float BAR_SIZE_V = 48 / 64f;
     private static final float BAR_STEP_U = BAR_SIZE_U;
+
+    // --------------------------------------------------------------------- //
+    // Persisted data
+
+    private final boolean[][] configuration = new boolean[COL_COUNT][ROW_COUNT];
+    private int position = -1;
+    private int delay = 4;
+    private int stepsRemaining = 0;
+
+    // --------------------------------------------------------------------- //
+    // Computed data
+
+    // NBT data names.
+    private static final String TAG_CONFIGURATION = "configuration";
+    private static final String TAG_POSITION = "position";
+    private static final String TAG_DELAY = "delay";
+    private static final String TAG_STEPS_REMAINING = "stepsRemaining";
+
+    // Data packet types.
+    private static final byte DATA_TYPE_CONFIGURATION = 0;
+    private static final byte DATA_TYPE_POSITION = 1;
+
+    private static final int COL_COUNT = 8;
+    private static final int ROW_COUNT = 8;
 
     private short output;
 
@@ -132,60 +127,6 @@ public final class SequencerModule extends AbstractModuleWithRotation {
             sendConfiguration(true);
         }
         getCasing().setChanged();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!isVisible()) {
-            return;
-        }
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        final boolean enabled = getCasing().isEnabled();
-        if (enabled) {
-            // Draw bar in background indicating current position in sequence.
-            final float barU0 = BAR_U0 + BAR_STEP_U * position;
-            final float brightness = 0.75f + 0.25f * (delay == 0 ? 1 : (1 - (delay - stepsRemaining) / (float) delay));
-            final int color = Color.withAlpha(BAR_COLOR, brightness);
-
-            context.drawQuadUnlit(barU0, BAR_V0, BAR_SIZE_U, BAR_SIZE_V, color);
-        }
-
-        // Draw base grid of sequencer entries.
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_SEQUENCER, Color.withAlpha(Color.WHITE, enabled ? 1f : 0.5f));
-
-        if (context.closeEnoughForDetails(getCasing().getPosition())) {
-            // Draw configuration of sequencer.
-            final int color = Color.withAlpha(ACTIVE_CELL_COLOR, enabled ? 1f : 0.5f);
-            for (int col = 0; col < COL_COUNT; col++) {
-                for (int row = 0; row < ROW_COUNT; row++) {
-                    if (configuration[col][row]) {
-                        final float u0 = CELLS_U0 + CELLS_STEP_U * col;
-                        final float v0 = CELLS_V0 + CELLS_STEP_V * row;
-                        context.drawQuadUnlit(u0, v0, CELLS_SIZE_U, CELLS_SIZE_V, color);
-                    }
-                }
-            }
-        }
-
-        // Draw selection overlay for focused cell, if any.
-        final Vec3 hitPos = getLocalHitPosition(context.getDispatcher().cameraHitResult);
-        if (hitPos != null) {
-            final Vec3 uv = hitToUV(hitPos);
-            final int col = uvToCol((float) uv.x);
-            final int row = uvToRow((float) uv.y);
-            if (col >= 0 && row >= 0) {
-                final float u = CELLS_OUTER_U0 + col * CELLS_OUTER_STEP_U;
-                final float v = CELLS_OUTER_V0 + row * CELLS_OUTER_STEP_V;
-                context.drawQuadUnlit(u, v, CELLS_OUTER_SIZE_U, CELLS_OUTER_SIZE_V, HIGHLIGHT_COLOR);
-            }
-        }
-
-        matrixStack.popPose();
     }
 
     @Override

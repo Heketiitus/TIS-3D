@@ -1,0 +1,63 @@
+package li.cil.tis3d.client.renderer.module;
+
+import li.cil.tis3d.api.module.Module;
+import li.cil.tis3d.api.util.RenderContext;
+import li.cil.tis3d.common.module.DisplayModule;
+import li.cil.tis3d.common.module.RedstoneModule;
+
+public class RedstoneModuleRenderer extends AbstractModuleWithRotationRenderer<RedstoneModule> {
+
+    // Rendering info.
+    private static final float OUTPUT_X = 9 / 32f;
+    private static final float INPUT_X = 20 / 32f;
+    private static final float SHARED_V0 = 10 / 32f;
+    private static final float SHARED_Y = 25 / 32f;
+    private static final float SHARED_W = 3 / 32f;
+    private static final float SHARED_H = SHARED_Y - SHARED_V0;
+
+
+    @Override
+    public boolean matches(Module module) {
+        return module instanceof RedstoneModule;
+    }
+
+    @Override
+    public void render(final RedstoneModule module, final RenderContext context) {
+/*
+        if (!module.getCasing().isEnabled()) {
+            return;
+        }
+final PoseStack matrixStack = context.getMatrixStack();
+        matrixStack.pushPose();
+        rotateForRendering(matrixStack);
+
+        // Draw base overlay.
+        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE);
+
+        if (!getCasing().isEnabled()) {
+            matrixStack.popPose();
+            return;
+        }
+
+        // Draw output bar.
+        final float relativeOutput = output / 15f;
+        final float heightOutput = relativeOutput * SHARED_H;
+        final float v0Output = SHARED_Y - heightOutput;
+        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE_BARS,
+            OUTPUT_X, v0Output, SHARED_W, heightOutput,
+            OUTPUT_X, v0Output, OUTPUT_X + SHARED_W, v0Output + heightOutput,
+            Color.WHITE);
+
+        // Draw input bar.
+        final float relativeInput = input / 15f;
+        final float heightInput = relativeInput * SHARED_H;
+        final float v0Input = SHARED_Y - heightInput;
+        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_REDSTONE_BARS,
+            INPUT_X, v0Input, SHARED_W, heightInput,
+            INPUT_X, v0Input, INPUT_X + SHARED_W, v0Input + heightInput,
+            Color.WHITE);
+
+        matrixStack.popPose();
+ */
+    }
+}

@@ -95,16 +95,6 @@ public final class SerialPortModule extends AbstractModule implements ModuleWith
         stepOutput();
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled()) {
-            return;
-        }
-
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_SERIAL_PORT);
-    }
-
     @Override
     public void load(final CompoundTag tag) {
         super.load(tag);

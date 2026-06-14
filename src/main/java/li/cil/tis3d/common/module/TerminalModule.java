@@ -222,28 +222,6 @@ public final class TerminalModule extends AbstractModuleWithRotation {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled() || !isVisible()) {
-            return;
-        }
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        if (context.closeEnoughForDetails(getCasing().getPosition())) {
-            // Player is close, render actual terminal text.
-            renderText(context);
-        } else {
-            // Player too far away for details, draw static overlay.
-            context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_TERMINAL);
-        }
-
-        matrixStack.popPose();
-    }
-
     @Override
     public void load(final CompoundTag tag) {
         super.load(tag);

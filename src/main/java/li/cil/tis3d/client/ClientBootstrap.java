@@ -1,6 +1,7 @@
 package li.cil.tis3d.client;
 
 import li.cil.tis3d.client.gui.ReadOnlyMemoryModuleScreen;
+import li.cil.tis3d.client.renderer.ModuleRenderers;
 import li.cil.tis3d.client.renderer.color.CasingBlockColor;
 import li.cil.tis3d.client.renderer.entity.NullEntityRenderer;
 import li.cil.tis3d.common.block.Blocks;
@@ -16,6 +17,8 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @ClientSided
 public final class ClientBootstrap {
     public static void setup(IEventBus bus) {
+        ModuleRenderers.initialize(bus);
+
         bus.addListener((RegisterColorHandlersEvent.Block e) ->
             e.register(new CasingBlockColor(), Blocks.CASING.get()));
 

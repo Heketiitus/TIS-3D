@@ -183,21 +183,6 @@ public interface Module {
     // --------------------------------------------------------------------- //
 
     /**
-     * Called to allow the module to render dynamic content on the casing it
-     * is installed in.
-     * <p>
-     * The render state will be adjusted to take into account the face the
-     * module is installed in, i.e. rendering from (0, 0, 0) to (1, 1, 0) will
-     * render the full quad of face of the casing the module is installed in.
-     *
-     * @param context the current render context.
-     */
-    @ClientSided
-    void render(final RenderContext context);
-
-    // --------------------------------------------------------------------- //
-
-    /**
      * Restore the state of the module from the specified tag.
      *
      * @param tag the tag to load the state from.

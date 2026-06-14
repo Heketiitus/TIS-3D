@@ -91,33 +91,6 @@ public final class TimerModule extends AbstractModuleWithRotation {
         hasElapsed = false; // Recompute in render().
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled()) {
-            return;
-        }
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_TIMER);
-
-        // Render detailed state when player is close.
-        if (!hasElapsed && context.closeEnoughForDetails(getCasing().getPosition())) {
-            final long gameTime = context.getDispatcher().level.getGameTime();
-            final float remaining = (float) (timer - gameTime) - context.getPartialTicks();
-            if (remaining <= 0) {
-                hasElapsed = true;
-            } else {
-                drawState(context, remaining);
-            }
-        }
-
-        matrixStack.popPose();
-    }
-
     @Override
     public void load(final CompoundTag tag) {
         super.load(tag);

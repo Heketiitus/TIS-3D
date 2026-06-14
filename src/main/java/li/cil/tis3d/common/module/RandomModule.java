@@ -36,16 +36,6 @@ public final class RandomModule extends AbstractModule {
         stepOutput(port);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled()) {
-            return;
-        }
-
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_RANDOM);
-    }
-
     // --------------------------------------------------------------------- //
 
     /**

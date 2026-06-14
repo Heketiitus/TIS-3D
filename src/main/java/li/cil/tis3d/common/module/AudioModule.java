@@ -53,16 +53,6 @@ public final class AudioModule extends AbstractModule {
         lastStep = level.getGameTime();
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled()) {
-            return;
-        }
-
-        context.drawAtlasQuadLit(Textures.LOCATION_OVERLAY_MODULE_AUDIO);
-    }
-
     // --------------------------------------------------------------------- //
 
     /**

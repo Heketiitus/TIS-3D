@@ -8,6 +8,7 @@ import li.cil.tis3d.api.machine.Port;
 import li.cil.tis3d.api.module.Module;
 import li.cil.tis3d.api.util.RenderContext;
 import li.cil.tis3d.api.util.TransformUtil;
+import li.cil.tis3d.client.renderer.module.AbstractModuleRenderer;
 import li.cil.tis3d.util.ClientSided;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -73,55 +74,6 @@ public abstract class AbstractModule implements Module {
     }
 
     // --------------------------------------------------------------------- //
-    // Rendering utility
-
-    /**
-     * Utility method for determining whether the player is currently looking at this module.
-     *
-     * @param hitResult the current hit result.
-     * @return <tt>true</tt> if the observer is looking at the module, <tt>false</tt> otherwise.
-     */
-    protected boolean isHitFace(@Nullable final HitResult hitResult) {
-        if (!(hitResult instanceof final BlockHitResult blockHitResult)) {
-            return false;
-        }
-
-        final BlockPos pos = blockHitResult.getBlockPos();
-        return Objects.equals(getCasing().getPosition(), pos) &&
-            blockHitResult.getDirection() == Face.toDirection(getFace());
-    }
-
-    /**
-     * Utility method for determining the hit coordinate on the module's face the player is
-     * looking at. This will return {@code null} if the player is not currently looking
-     * at the module.
-     * <p>
-     * Note that this will return the unadjusted X, Y and Z components. To transform this
-     * coordinate to a UV coordinate mapped to the module's face, pass this into
-     * {@link #hitToUV}. Note that this method is overridden in {@link AbstractModuleWithRotation}
-     * to also take into account the module's rotation.
-     *
-     * @param hitResult the current hit result.
-     * @return the UV coordinate the observer is looking at as the X and Y components.
-     */
-    @Nullable
-    protected Vec3 getLocalHitPosition(@Nullable final HitResult hitResult) {
-        if (!(hitResult instanceof final BlockHitResult blockHitResult)) {
-            return null;
-        }
-
-        final BlockPos pos = blockHitResult.getBlockPos();
-        if (!Objects.equals(getCasing().getPosition(), pos)) {
-            return null;
-        }
-        if (blockHitResult.getDirection() != Face.toDirection(getFace())) {
-            return null;
-        }
-
-        return hitResult.getLocation().subtract(pos.getX(), pos.getY(), pos.getZ());
-    }
-
-    // --------------------------------------------------------------------- //
     // General utility
 
     /**
@@ -133,10 +85,9 @@ public abstract class AbstractModule implements Module {
      *
      * @param hitPos the hit position to project.
      * @return the projected UV coordinate, with the Z component being 0.
-     * @see #getLocalHitPosition(HitResult)
      * @see Module#use(Player, InteractionHand, Vec3)
      */
-    protected Vec3 hitToUV(final Vec3 hitPos) {
+    public Vec3 hitToUV(final Vec3 hitPos) {
         return TransformUtil.hitToUV(getFace(), hitPos);
     }
 
@@ -149,7 +100,7 @@ public abstract class AbstractModule implements Module {
      *
      * @return whether the module is currently visible.
      */
-    protected boolean isVisible() {
+    public boolean isVisible() {
         final Level level = getCasing().getCasingLevel();
         final BlockPos neighborPos = getCasing().getPosition().relative(Face.toDirection(getFace()));
         if (!level.isLoaded(neighborPos)) {
@@ -219,11 +170,6 @@ public abstract class AbstractModule implements Module {
 
     @Override
     public void onData(final ByteBuf data) {
-    }
-
-    @Override
-    @ClientSided
-    public void render(final RenderContext context) {
     }
 
     @Override

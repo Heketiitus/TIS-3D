@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * that can support the same {@link ItemStack}.
  * <p>
  * Additional providers may be registered with the {@link net.minecraft.core.Registry}
- * <tt>tis3d:modules</tt>.
+ * <tt>tis3d:module_provider</tt>.
  */
 public interface ModuleProvider {
     /**

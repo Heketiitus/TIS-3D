@@ -53,6 +53,15 @@ public final class StackModule extends AbstractModuleWithRotation {
         super(casing, face);
     }
 
+    public short getAt(int i) {
+        return stack[i];
+    }
+
+    public int getTop() {
+        return top;
+    }
+
+
     // --------------------------------------------------------------------- //
     // Module
 
@@ -96,27 +105,6 @@ public final class StackModule extends AbstractModuleWithRotation {
         for (int i = 0; i < stack.length; i++) {
             stack[i] = data.readShort();
         }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled()) {
-            return;
-        }
-
-        final PoseStack matrixStack = context.getMatrixStack();
-        matrixStack.pushPose();
-        rotateForRendering(matrixStack);
-
-        context.drawAtlasQuadUnlit(Textures.LOCATION_OVERLAY_MODULE_STACK);
-
-        // Render detailed state when player is close.
-        if (context.closeEnoughForDetails(getCasing().getPosition())) {
-            drawState(context);
-        }
-
-        matrixStack.popPose();
     }
 
     @Override
@@ -251,25 +239,5 @@ public final class StackModule extends AbstractModuleWithRotation {
             data.writeShort(value);
         }
         getCasing().sendData(getFace(), data, DATA_TYPE_UPDATE);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private void drawState(final RenderContext context) {
-        final PoseStack matrixStack = context.getMatrixStack();
-
-        // Offset to start drawing at top left of inner area, slightly inset.
-        matrixStack.translate(3 / 16f, 5 / 16f, 0);
-        matrixStack.scale(1 / 128f, 1 / 128f, 1);
-        matrixStack.translate(4.5f, 14.5f, 0);
-
-        final FontRenderer fontRenderer = API.smallFontRenderer;
-
-        for (int i = 0; i <= top; i++) {
-            context.drawString(fontRenderer, String.format("%4X", stack[i]), Color.WHITE);
-            matrixStack.translate(0, fontRenderer.lineHeight() + 1, 0);
-            if ((i + 1) % 4 == 0) {
-                matrixStack.translate((fontRenderer.width(" ") + 1) * 5, (fontRenderer.lineHeight() + 1) * -4, 0);
-            }
-        }
     }
 }
